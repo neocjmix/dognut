@@ -1,0 +1,17 @@
+{
+  "name": "dognut",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Chanjin Park <frank.park@kakaocorp.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "esm": "^3.2.25",
+    "jsdom": "15.2.1",
+    "jsdom-global": "3.0.2",
+    "mocha": "^6.2.2"
+  },
+  "mocha": {
+    "require": "esm"
+  }
+}
