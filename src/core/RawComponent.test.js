@@ -6,26 +6,24 @@ const expect = chai.expect
 
 describe('RawComponent', () => {
 
-  describe('creates renderer with attrs and children', () => {
-    const divRenderer = rawComponent('div')({})()
-    const spanRenderer = rawComponent('span')({})()
-
-    it('nodeName is the value entered for nodeName when it is created', () => {
-      expect(divRenderer.nodeName).to.equal('div')
-      expect(divRenderer.render).to.be.a('function')
-
-      expect(spanRenderer.nodeName).to.equal('span')
-      expect(spanRenderer.render).to.be.a('function')
-    })
-  })
-
-
   describe('Renderer', () => {
     const div = rawComponent('div')
     const span = rawComponent('span')
 
-    describe('generates DOM in container', () => {
+    describe('nodeName', () => {
+      it(' is the value entered for nodeName when it is created', () => {
+        const divRenderer = div({})()
+        const spanRenderer = span({})()
 
+        expect(divRenderer.nodeName).to.equal('div')
+        expect(divRenderer.render).to.be.a('function')
+
+        expect(spanRenderer.nodeName).to.equal('span')
+        expect(spanRenderer.render).to.be.a('function')
+      })
+    })
+
+    describe('render', () => {
       let cleanup
       let appContainer
 
@@ -40,42 +38,24 @@ describe('RawComponent', () => {
 
       after('clean up', () => cleanup())
 
-      it('throw error when containers nodename is not match with given one', () => {
+      it('throws error when containers nodename is not match with given one', () => {
         expect(() => div()().render(document.getElementById('paragraph'))).to.throw()
       })
 
-      it('resets existing attrs and inner content', () => {
+      it('removes old attrs and contents not existing in new content', () => {
         div()().render(appContainer)
         expect(appContainer.getAttributeNames()).to.have.lengthOf(0)
         expect(appContainer.innerHTML).to.equal('')
       })
 
-      it('sets new attrs and inner content', () => {
+      it('sets new attrs and inner content in the container', () => {
         div({class: 'my-class'})('new content').render(appContainer)
         expect(appContainer.getAttributeNames()).to.have.lengthOf(1)
         expect(appContainer.getAttribute('class')).to.equal('my-class')
         expect(appContainer.innerHTML).to.equal('new content')
       })
 
-    })
-
-    describe('generates nested DOM in container', () => {
-
-      let cleanup
-      let appContainer
-
-      before('setup app container', () => {
-        cleanup = jsdom()
-        document.body.innerHTML = `
-          <div id="div">default content</div>
-          <p id="paragraph">default content</p>
-        `
-        appContainer = document.getElementById('div')
-      })
-
-      after('clean up', () => cleanup())
-
-      it('nest DOM is generated recursivly', () => {
+      it('generates nested DOM recursivly', () => {
         div({class: 'out'})(
           'out',
           div({class: 'in1'})('in1'),
@@ -94,100 +74,81 @@ describe('RawComponent', () => {
         expect(appContainer.childNodes[2].className).to.equal('in2')
         expect(appContainer.childNodes[2].innerHTML).to.equal('in2')
       })
-    })
 
-    describe('generates DOM repeatly in same container', () => {
+      it('if possible, each child node is preserved and only its attrs and contents are changed', () => {
+        div({class: 'out'})(
+          'out1',
+          div({class: 'in1-1'})('in1-1'),
+          div({class: 'in1-2'})('in1-2'),
+        ).render(appContainer)
 
-      describe('same node type case', () => {
-        let cleanup
-        let appContainer
+        const out = appContainer.childNodes[0]
+        const in1 = appContainer.childNodes[1]
+        const in2 = appContainer.childNodes[2]
+        expect(out.textContent).to.equal('out1')
+        expect(in1.innerHTML).to.equal('in1-1')
+        expect(in2.innerHTML).to.equal('in1-2')
 
-        before('setup app container', () => {
-          cleanup = jsdom()
-          document.body.innerHTML = `
-          <div id="div">default content</div>
-          <p id="paragraph">default content</p>
-        `
-          appContainer = document.getElementById('div')
-        })
+        div({class: 'out2'})(
+          'out2',
+          div({class: 'in2-1'})('in2-1'),
+          div({class: 'in2-2'})('in2-2'),
+        ).render(appContainer)
 
-        after('clean up', () => cleanup())
+        expect(appContainer.childNodes[0]).to.equal(out)
+        expect(appContainer.childNodes[1]).to.equal(in1)
+        expect(appContainer.childNodes[2]).to.equal(in2)
+        expect(out.textContent).to.equal('out2')
+        expect(in1.innerHTML).to.equal('in2-1')
+        expect(in2.innerHTML).to.equal('in2-2')
+      })
 
-        it('each child node preserves and only its attrs and contents are changed', () => {
-          div({class: 'out'})(
-            'out1',
-            div({class: 'in1-1'})('in1-1'),
-            div({class: 'in1-2'})('in1-2'),
-          ).render(appContainer)
+      it('replace each old element with newly generated child node if they are different type each other', () => {
+        // original render
+        div({class: 'out'})(
+          'out1',
+          span({class: 'in1-1'})('in1-1'),
+          div({class: 'in1-2'})('in1-2'),
+        ).render(appContainer)
 
-          const out = appContainer.childNodes[0]
-          const in1 = appContainer.childNodes[1]
-          const in2 = appContainer.childNodes[2]
-          expect(out.textContent).to.equal('out1')
-          expect(in1.innerHTML).to.equal('in1-1')
-          expect(in2.innerHTML).to.equal('in1-2')
+        const out = appContainer.childNodes[0]
+        const in1 = appContainer.childNodes[1]
+        const in2 = appContainer.childNodes[2]
+        expect(appContainer.childNodes).to.have.lengthOf(3)
 
-          div({class: 'out2'})(
-            'out2',
-            div({class: 'in2-1'})('in2-1'),
-            div({class: 'in2-2'})('in2-2'),
-          ).render(appContainer)
+        expect(out.textContent).to.equal('out1')
+        expect(in1.innerHTML).to.equal('in1-1')
+        expect(in2.innerHTML).to.equal('in1-2')
 
-          expect(appContainer.childNodes[0]).to.equal(out)
-          expect(appContainer.childNodes[1]).to.equal(in1)
-          expect(appContainer.childNodes[2]).to.equal(in2)
-          expect(out.textContent).to.equal('out2')
-          expect(in1.innerHTML).to.equal('in2-1')
-          expect(in2.innerHTML).to.equal('in2-2')
-        })
+        // update1
+        div({class: 'out2'})(
+          div({class: 'in2-1'})('in2-1'),
+          span({class: 'in2-2'})('in2-2'),
+          'out2',
+        ).render(appContainer)
 
-        it('works fine in the case where children nodes are different from previous render result', () => {
-          // original render
-          div({class: 'out'})(
-            'out1',
-            span({class: 'in1-1'})('in1-1'),
-            div({class: 'in1-2'})('in1-2'),
-          ).render(appContainer)
+        expect(appContainer.childNodes).to.have.lengthOf(3)
 
-          const out = appContainer.childNodes[0]
-          const in1 = appContainer.childNodes[1]
-          const in2 = appContainer.childNodes[2]
-          expect(appContainer.childNodes).to.have.lengthOf(3)
+        expect(appContainer.childNodes[1]).to.equal(in1)
 
-          expect(out.textContent).to.equal('out1')
-          expect(in1.innerHTML).to.equal('in1-1')
-          expect(in2.innerHTML).to.equal('in1-2')
+        expect(appContainer.childNodes[0].innerHTML).to.equal('in2-1')
+        expect(appContainer.childNodes[1].innerHTML).to.equal('in2-2')
+        expect(appContainer.childNodes[2].textContent).to.equal('out2')
 
-          // update1
-          div({class: 'out2'})(
-            div({class: 'in2-1'})('in2-1'),
-            span({class: 'in2-2'})('in2-2'),
-            'out2',
-          ).render(appContainer)
+        // update2
+        div({class: 'out'})(
+          'out13',
+          span({class: 'in3-1'})('in3-1'),
+          div({class: 'in3-2'})('in3-2'),
+        ).render(appContainer)
 
-          expect(appContainer.childNodes).to.have.lengthOf(3)
+        expect(appContainer.childNodes).to.have.lengthOf(3)
 
-          expect(appContainer.childNodes[1]).to.equal(in1)
+        expect(appContainer.childNodes[1]).to.equal(in1)
 
-          expect(appContainer.childNodes[0].innerHTML).to.equal('in2-1')
-          expect(appContainer.childNodes[1].innerHTML).to.equal('in2-2')
-          expect(appContainer.childNodes[2].textContent).to.equal('out2')
-
-          // update2
-          div({class: 'out'})(
-            'out13',
-            span({class: 'in3-1'})('in3-1'),
-            div({class: 'in3-2'})('in3-2'),
-          ).render(appContainer)
-
-          expect(appContainer.childNodes).to.have.lengthOf(3)
-
-          expect(appContainer.childNodes[1]).to.equal(in1)
-
-          expect(appContainer.childNodes[0].textContent).to.equal('out13')
-          expect(appContainer.childNodes[1].innerHTML).to.equal('in3-1')
-          expect(appContainer.childNodes[2].innerHTML).to.equal('in3-2')
-        })
+        expect(appContainer.childNodes[0].textContent).to.equal('out13')
+        expect(appContainer.childNodes[1].innerHTML).to.equal('in3-1')
+        expect(appContainer.childNodes[2].innerHTML).to.equal('in3-2')
       })
     })
   })
