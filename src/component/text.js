@@ -1,5 +1,5 @@
 export const text = () => content => ({
-  tagName: '#text',
+  nodeName: '#text',
   render: container => {
     if (!container) {
       container = document.createTextNode(content)

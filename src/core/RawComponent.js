@@ -1,4 +1,4 @@
-import {flatten, normalizeToComponent} from '../common'
+import {normalizeToComponent} from '../common'
 
 const updateAttrs = (container, attrs) => {
   const existingAttrNames = container.getAttributeNames().sort()
@@ -22,30 +22,48 @@ const updateAttrs = (container, attrs) => {
     })
 }
 
-const updateChildren = (container, children) => {
-  const existingChilds = [].slice.apply(container.childNodes)
+const compareNodeType = (node, nodeName) => {
+  if (node == null) return 'NO_OLD_NODE'
+  if (nodeName.toUpperCase() === node.nodeName.toUpperCase()) return 'SAME_TYPE'
+  return 'DIFFERENT_TYPE'
+}
 
-  flatten(children).map(normalizeToComponent)
-    .forEach((component, index) => {
-      const childNode = existingChilds.shift()
-      if (childNode) {
-        component.render(childNode)
-      } else {
-        container.appendChild(component.render())
+const updateChildren = (container, children) => {
+  const oldChildren = Array.from(container.childNodes)
+
+  children
+    .forEach((child, index) => {
+      const childComponent = normalizeToComponent(child)
+      const oldChild = oldChildren[index]
+
+      switch (compareNodeType(oldChild, childComponent.nodeName)) {
+        case 'SAME_TYPE':
+          childComponent.render(oldChild)
+          break
+        case 'DIFFERENT_TYPE':
+          container.insertBefore(childComponent.render(), oldChild)
+          oldChild.remove()
+          break
+        case 'NO_OLD_NODE':
+          container.appendChild(childComponent.render())
+          break
+        default:
       }
     })
 
-  existingChilds.forEach(childNode => childNode.remove())
+  oldChildren
+    .slice(children.length)
+    .forEach(childNode => childNode.remove())
 }
 
-export const rawComponent = tagName => (attrs = {}) => (...children) => ({
-  tagName,
+export const rawComponent = nodeName => (attrs = {}) => (...children) => ({
+  nodeName,
   render: container => {
     if (!container) {
-      container = document.createElement(tagName)
+      container = document.createElement(nodeName)
     }
 
-    if (container.nodeName.toLowerCase() !== tagName.toLowerCase()) {
+    if (compareNodeType(container, nodeName) !== "SAME_TYPE") {
       throw new Error('container type is not match with given one')
     }
 

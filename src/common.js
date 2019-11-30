@@ -1,4 +1,4 @@
-import {text} from './component/raw/text'
+import {text} from './component/text'
 
 const isFlatMappable = obj => obj && obj.flatMap && typeof obj.flatMap === 'function'
 
