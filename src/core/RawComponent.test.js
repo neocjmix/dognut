@@ -7,13 +7,13 @@ const expect = chai.expect
 describe('RawComponent', () => {
 
   describe('Renderer', () => {
-    const div = rawComponent('div')
-    const span = rawComponent('span')
+    const Div = rawComponent('div')
+    const Span = rawComponent('span')
 
     describe('nodeName', () => {
       it(' is the value entered for nodeName when it is created', () => {
-        const divRenderer = div({})()
-        const spanRenderer = span({})()
+        const divRenderer = Div({})()
+        const spanRenderer = Span({})()
 
         expect(divRenderer.nodeName).to.equal('div')
         expect(divRenderer.render).to.be.a('function')
@@ -39,27 +39,27 @@ describe('RawComponent', () => {
       after('clean up', () => cleanup())
 
       it('throws error when containers nodename is not match with given one', () => {
-        expect(() => div()().render(document.getElementById('paragraph'))).to.throw()
+        expect(() => Div()().render(document.getElementById('paragraph'))).to.throw()
       })
 
       it('removes old attrs and contents not existing in new content', () => {
-        div()().render(appContainer)
+        Div()().render(appContainer)
         expect(appContainer.getAttributeNames()).to.have.lengthOf(0)
         expect(appContainer.innerHTML).to.equal('')
       })
 
       it('sets new attrs and inner content in the container', () => {
-        div({class: 'my-class'})('new content').render(appContainer)
+        Div({class: 'my-class'})('new content').render(appContainer)
         expect(appContainer.getAttributeNames()).to.have.lengthOf(1)
         expect(appContainer.getAttribute('class')).to.equal('my-class')
         expect(appContainer.innerHTML).to.equal('new content')
       })
 
       it('generates nested DOM recursivly', () => {
-        div({class: 'out'})(
+        Div({class: 'out'})(
           'out',
-          div({class: 'in1'})('in1'),
-          div({class: 'in2'})('in2'),
+          Div({class: 'in1'})('in1'),
+          Div({class: 'in2'})('in2'),
         ).render(appContainer)
 
         expect(appContainer.getAttributeNames()).to.have.lengthOf(1)
@@ -76,10 +76,10 @@ describe('RawComponent', () => {
       })
 
       it('if possible, each child node is preserved and only its attrs and contents are changed', () => {
-        div({class: 'out'})(
+        Div({class: 'out'})(
           'out1',
-          div({class: 'in1-1'})('in1-1'),
-          div({class: 'in1-2'})('in1-2'),
+          Div({class: 'in1-1'})('in1-1'),
+          Div({class: 'in1-2'})('in1-2'),
         ).render(appContainer)
 
         const out = appContainer.childNodes[0]
@@ -89,10 +89,10 @@ describe('RawComponent', () => {
         expect(in1.innerHTML).to.equal('in1-1')
         expect(in2.innerHTML).to.equal('in1-2')
 
-        div({class: 'out2'})(
+        Div({class: 'out2'})(
           'out2',
-          div({class: 'in2-1'})('in2-1'),
-          div({class: 'in2-2'})('in2-2'),
+          Div({class: 'in2-1'})('in2-1'),
+          Div({class: 'in2-2'})('in2-2'),
         ).render(appContainer)
 
         expect(appContainer.childNodes[0]).to.equal(out)
@@ -105,10 +105,10 @@ describe('RawComponent', () => {
 
       it('replace each old element with newly generated child node if they are different type each other', () => {
         // original render
-        div({class: 'out'})(
+        Div({class: 'out'})(
           'out1',
-          span({class: 'in1-1'})('in1-1'),
-          div({class: 'in1-2'})('in1-2'),
+          Span({class: 'in1-1'})('in1-1'),
+          Div({class: 'in1-2'})('in1-2'),
         ).render(appContainer)
 
         const out = appContainer.childNodes[0]
@@ -121,9 +121,9 @@ describe('RawComponent', () => {
         expect(in2.innerHTML).to.equal('in1-2')
 
         // update1
-        div({class: 'out2'})(
-          div({class: 'in2-1'})('in2-1'),
-          span({class: 'in2-2'})('in2-2'),
+        Div({class: 'out2'})(
+          Div({class: 'in2-1'})('in2-1'),
+          Span({class: 'in2-2'})('in2-2'),
           'out2',
         ).render(appContainer)
 
@@ -136,10 +136,14 @@ describe('RawComponent', () => {
         expect(appContainer.childNodes[2].textContent).to.equal('out2')
 
         // update2
-        div({class: 'out'})(
+        Div({class: 'out'})(
           'out13',
-          span({class: 'in3-1'})('in3-1'),
-          div({class: 'in3-2'})('in3-2'),
+          Span({class: 'in3-1'})(
+            'in3-1'
+          ),
+          Div({class: 'in3-2'})(
+            'in3-2'
+          ),
         ).render(appContainer)
 
         expect(appContainer.childNodes).to.have.lengthOf(3)
