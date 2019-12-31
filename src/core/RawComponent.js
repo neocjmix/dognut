@@ -1,4 +1,14 @@
-import {normalizeToComponent} from '../common'
+import {flatten} from '../common'
+
+const CHILD_INDEX = Symbol('childIndex')
+const NO_OLD_NODE = Symbol('noOldNode')
+const SAME_TYPE = Symbol('sameType')
+const DIFFERENT_TYPE = Symbol('differentType')
+
+const normalizeToComponent = child => {
+  if (typeof child === 'string') return textNode()(child)
+  return child
+}
 
 const updateAttrs = (container, attrs) => {
   const existingAttrNames = container.getAttributeNames().sort()
@@ -23,52 +33,93 @@ const updateAttrs = (container, attrs) => {
 }
 
 const compareNodeType = (node, nodeName) => {
-  if (node == null) return 'NO_OLD_NODE'
-  if (nodeName.toUpperCase() === node.nodeName.toUpperCase()) return 'SAME_TYPE'
-  return 'DIFFERENT_TYPE'
+  if (node == null) return NO_OLD_NODE
+  if (nodeName.toUpperCase() === node.nodeName.toUpperCase()) return SAME_TYPE
+  return DIFFERENT_TYPE
 }
 
-const updateChildren = (container, children) => {
+const applyComponent = (container, targetElement, prevElement, childComponent) => {
+  const compareResult = compareNodeType(targetElement, childComponent.nodeName)
+
+  if (compareResult === SAME_TYPE) {
+    return childComponent.render(targetElement)
+  }
+
+  if (compareResult === DIFFERENT_TYPE) {
+    const renderedElement = childComponent.render()
+    container.insertBefore(renderedElement, targetElement)
+    targetElement.remove()
+    return renderedElement
+  }
+
+  if (compareResult === NO_OLD_NODE) {
+    const renderedElement = childComponent.render()
+    const nextSibling = prevElement && prevElement.nextSibling
+    if(nextSibling){
+      container.insertBefore(renderedElement, nextSibling)
+    }else{
+      container.appendChild(renderedElement)
+    }
+    return renderedElement
+  }
+}
+
+const groupByIndexAttr = oldChildren => oldChildren
+  .reduce((arr, oldChild) => {
+    const currentIndex = oldChild[CHILD_INDEX] || arr.length
+    if (arr[currentIndex] == null) arr[currentIndex] = []
+    arr[currentIndex].push(oldChild)
+    return arr
+  }, [])
+
+const updateChildren = (container, newChildrenGroup) => {
   const oldChildren = Array.from(container.childNodes)
+  const oldChildrenGroupedByIndex = groupByIndexAttr(oldChildren)
 
-  children
-    .forEach((child, index) => {
-      const childComponent = normalizeToComponent(child)
-      const oldChild = oldChildren[index]
+  newChildrenGroup
+    .forEach((newChildren, groupIndex) => {
+      const flattenedNewChildren = flatten(newChildren)
+      const assignedOldChildGroup = oldChildrenGroupedByIndex[groupIndex]
 
-      switch (compareNodeType(oldChild, childComponent.nodeName)) {
-        case 'SAME_TYPE':
-          childComponent.render(oldChild)
-          break
-        case 'DIFFERENT_TYPE':
-          container.insertBefore(childComponent.render(), oldChild)
-          oldChild.remove()
-          break
-        case 'NO_OLD_NODE':
-          container.appendChild(childComponent.render())
-          break
-        default:
-      }
+      flattenedNewChildren
+        .reduce((prevElement, newChild, index) => {
+          const childComponent = normalizeToComponent(newChild)
+          const assignedOldChild = assignedOldChildGroup && assignedOldChildGroup[index]
+          const rendered = applyComponent(container, assignedOldChild, prevElement, childComponent)
+          rendered[CHILD_INDEX] = groupIndex
+          return rendered;
+        }, null)
     })
 
-  oldChildren
-    .slice(children.length)
-    .forEach(childNode => childNode.remove())
+  const oldChildrenLeftUnmatched = oldChildrenGroupedByIndex.slice(newChildrenGroup.length)
+  flatten(oldChildrenLeftUnmatched).forEach(childNode => childNode.remove())
 }
 
-export const rawComponent = nodeName => (attrs = {}) => (...children) => ({
+const rawComponent = nodeName => (attrs = {}) => (...children) => ({
+  children,
   nodeName,
   render: container => {
     if (!container) {
-      container = document.createElement(nodeName)
+      container = nodeName === '#text'
+        ? document.createTextNode(children[0])
+        : document.createElement(nodeName)
     }
 
-    if (compareNodeType(container, nodeName) !== "SAME_TYPE") {
+    if (compareNodeType(container, nodeName) !== SAME_TYPE) {
       throw new Error('container type is not match with given one')
     }
 
-    updateAttrs(container, attrs)
-    updateChildren(container, children)
+    if (nodeName !== '#text') {
+      updateAttrs(container, attrs)
+      updateChildren(container, children)
+    } else if (container.nodeValue !== children[0]) {
+      container.nodeValue = children[0]
+    }
+
     return container
   },
 })
+
+const textNode = rawComponent('#text')
+
+export {rawComponent, CHILD_INDEX}
