@@ -6,38 +6,56 @@ const expect = chai.expect
 
 describe('RawComponent', () => {
 
-  describe('Renderer', () => {
-    const Div = rawComponent('div')
-    const Span = rawComponent('span')
-
-    describe('nodeName', () => {
-      it('is the value entered for nodeName when it is created', () => {
-        const divRenderer = Div({})()
-        const spanRenderer = Span({})()
-
-        expect(divRenderer.nodeName).to.equal('div')
-        expect(divRenderer.render).to.be.a('function')
-
-        expect(spanRenderer.nodeName).to.equal('span')
-        expect(spanRenderer.render).to.be.a('function')
-      })
+  describe('constructing', () => {
+    describe('when: it is constructed with attrs and children', div => {
+      beforeEach(() => (div = rawComponent('div')({ class : 'test '})('content')))
+      it('then: the instance has a render method', () => expect(div.render).to.be.a('function'))
     })
 
-    describe('render', () => {
-      let cleanup
-      let appContainer
+    describe('when: it is constructed without children', div => {
+      beforeEach(() => (div = rawComponent('div')({ class : 'test '})))
+      it('then: the instance has a render method', () => expect(div.render).to.be.a('function'))
+    })
 
-      beforeEach('setup app container', () => {
+    describe('when: it is constructed without attrs', div => {
+      beforeEach(() => (div = rawComponent('div')('content')))
+      it('then: the instance has a render method', () => expect(div.render).to.be.a('function'))
+    })
+
+    describe('when: it is constructed without attrs and children', div => {
+      beforeEach(() => (div = rawComponent('div')))
+      it('then: the instance has a render method', () => expect(div.render).to.be.a('function'))
+    })
+
+    describe('when: it is constructed with certain node name value', (div, span, foo, bar) => {
+      beforeEach(() => {
+        div = rawComponent('div')({})()
+        span = rawComponent('span')({})()
+        foo = rawComponent('foo')({})()
+        bar = rawComponent('bar')({})()
+      })
+
+      it('then: the nodeName property is equal to the node name value', () => {
+        expect(div.nodeName).to.equal('div')
+        expect(span.nodeName).to.equal('span')
+        expect(foo.nodeName).to.equal('foo')
+        expect(bar.nodeName).to.equal('bar')
+      })
+    })
+  })
+
+  describe('given: there is an app container element having default content, Div raw component and Span raw component',
+    (cleanup, appContainer, Div, Span) => {
+      beforeEach('setup app container and raw components', () => {
+        Div = rawComponent('div')
+        Span = rawComponent('span')
         cleanup = jsdom()
-        document.body.innerHTML = `
-          <div id="div">default content</div>
-          <p id="paragraph">default content</p>
-        `
+
+        document.body.innerHTML = '<div id="div">default content</div><p id="paragraph">default content</p>'
         appContainer = document.getElementById('div')
       })
 
-      after('clean up', () => cleanup())
-
+      afterEach('clean up', () => cleanup())
 
       it('throws error when containers nodename is not match with given one', () => {
         expect(() => Div()().render(document.getElementById('paragraph'))).to.throw()
@@ -337,5 +355,4 @@ describe('RawComponent', () => {
         })
       })
     })
-  })
 })

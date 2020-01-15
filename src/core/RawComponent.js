@@ -55,9 +55,9 @@ const applyComponent = (container, targetElement, prevElement, childComponent) =
   if (compareResult === NO_OLD_NODE) {
     const renderedElement = childComponent.render()
     const nextSibling = prevElement && prevElement.nextSibling
-    if(nextSibling){
+    if (nextSibling) {
       container.insertBefore(renderedElement, nextSibling)
-    }else{
+    } else {
       container.appendChild(renderedElement)
     }
     return renderedElement
@@ -87,7 +87,7 @@ const updateChildren = (container, newChildrenGroup) => {
           const assignedOldChild = assignedOldChildGroup && assignedOldChildGroup[index]
           const rendered = applyComponent(container, assignedOldChild, prevElement, childComponent)
           rendered[CHILD_INDEX] = groupIndex
-          return rendered;
+          return rendered
         }, null)
     })
 
@@ -95,31 +95,46 @@ const updateChildren = (container, newChildrenGroup) => {
   flatten(oldChildrenLeftUnmatched).forEach(childNode => childNode.remove())
 }
 
-const rawComponent = nodeName => (attrs = {}) => (...children) => ({
-  children,
-  nodeName,
-  render: container => {
-    if (!container) {
-      container = nodeName === '#text'
-        ? document.createTextNode(children[0])
-        : document.createElement(nodeName)
+const _rawComponent = (nodeName, attrs = {}, children = []) => {
+  return {
+    nodeName,
+    attrs,
+    children,
+    render(container) {
+      if (!container) {
+        container = this.nodeName === '#text'
+          ? document.createTextNode(this.children[0])
+          : document.createElement(this.nodeName)
+      }
+
+      if (compareNodeType(container, this.nodeName) !== SAME_TYPE) {
+        throw new Error('container type is not match with given one')
+      }
+
+      if (this.nodeName !== '#text') {
+        updateAttrs(container, this.attrs)
+        updateChildren(container, this.children)
+      } else if (container.nodeValue !== this.children[0]) {
+        container.nodeValue = this.children[0]
+      }
+
+      return container
     }
+  }
+}
 
-    if (compareNodeType(container, nodeName) !== SAME_TYPE) {
-      throw new Error('container type is not match with given one')
-    }
+function isChildrenArgs(args) {
+  return args[0] && typeof args[0].render === 'function'
+}
 
-    if (nodeName !== '#text') {
-      updateAttrs(container, attrs)
-      updateChildren(container, children)
-    } else if (container.nodeValue !== children[0]) {
-      container.nodeValue = children[0]
-    }
+const initWithNodeNameAndAttrs = (nodeName, attrs) => (...children) => _rawComponent(nodeName, attrs, children)
 
-    return container
-  },
-})
+const initWithNodeName = nodeName => (...args) => !isChildrenArgs(args)
+  ? Object.assign(initWithNodeNameAndAttrs(nodeName, args[0]), _rawComponent(nodeName, args[0]))
+  : _rawComponent(nodeName, {}, ...args)
 
-const textNode = rawComponent('#text')
+const init = nodeName => Object.assign(initWithNodeName(nodeName), _rawComponent(nodeName))
 
-export {rawComponent, CHILD_INDEX}
+const textNode = init('#text')
+
+export {init as rawComponent, CHILD_INDEX}
