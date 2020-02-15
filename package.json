@@ -1,6 +1,7 @@
 {
   "name": "dognut",
   "version": "1.0.0",
+  "description": "document object generator",
   "main": "index.js",
   "author": "Chanjin Park <frank.park@kakaocorp.com>",
   "license": "MIT",

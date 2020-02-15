@@ -1,4 +1,4 @@
-import {flatten} from '../common'
+import {flatten} from '../common.js'
 
 const CHILD_INDEX = Symbol('childIndex')
 const NO_OLD_NODE = Symbol('noOldNode')
@@ -124,14 +124,19 @@ const _rawComponent = (nodeName, attrs = {}, children = []) => {
 }
 
 function isChildrenArgs(args) {
-  return args[0] && typeof args[0].render === 'function'
+  if(args[0] == null) return false // noargs
+  if(typeof args[0] === 'string') return true // textNode
+  if(typeof args[0].render === 'function') return true // childComponent
+  return false
 }
 
 const initWithNodeNameAndAttrs = (nodeName, attrs) => (...children) => _rawComponent(nodeName, attrs, children)
 
-const initWithNodeName = nodeName => (...args) => !isChildrenArgs(args)
-  ? Object.assign(initWithNodeNameAndAttrs(nodeName, args[0]), _rawComponent(nodeName, args[0]))
-  : _rawComponent(nodeName, {}, ...args)
+const initWithNodeName = nodeName => (...args) => {
+  return isChildrenArgs(args)
+    ? _rawComponent(nodeName, {}, args)
+    : Object.assign(initWithNodeNameAndAttrs(nodeName, args[0]), _rawComponent(nodeName, args[0]))
+}
 
 const init = nodeName => Object.assign(initWithNodeName(nodeName), _rawComponent(nodeName))
 

@@ -5,29 +5,40 @@ import {rawComponent} from './RawComponent'
 const expect = chai.expect
 
 describe('RawComponent', () => {
-
   describe('constructing', () => {
-    describe('when: it is constructed with attrs and children', div => {
-      beforeEach(() => (div = rawComponent('div')({ class : 'test '})('content')))
+    describe('given: it is constructed with attrs and children', div => {
+      beforeEach(() => (div = rawComponent('div')({ class : 'test'})('content')))
       it('then: the instance has a render method', () => expect(div.render).to.be.a('function'))
+      it('and: the instance has a entered nodeName', () => expect(div.nodeName).to.equal('div'))
+      it('and: the instance has entered attributes', () => expect(div.attrs).to.deep.equal({ class : 'test'}))
+      it('and: the instance has entered children', () => expect(div.children).to.deep.equal(['content']))
     })
 
-    describe('when: it is constructed without children', div => {
-      beforeEach(() => (div = rawComponent('div')({ class : 'test '})))
+    describe('given: it is constructed without children', div => {
+      beforeEach(() => (div = rawComponent('div')({ class : 'test'})))
       it('then: the instance has a render method', () => expect(div.render).to.be.a('function'))
+      it('and: the instance has a entered nodeName', () => expect(div.nodeName).to.equal('div'))
+      it('and: the instance has entered attributes', () => expect(div.attrs).to.deep.equal({ class : 'test'}))
+      it('and: the instance has entered children', () => expect(div.children).to.deep.equal([]))
     })
 
-    describe('when: it is constructed without attrs', div => {
+    describe('given: it is constructed without attrs', div => {
       beforeEach(() => (div = rawComponent('div')('content')))
       it('then: the instance has a render method', () => expect(div.render).to.be.a('function'))
+      it('and: the instance has a entered nodeName', () => expect(div.nodeName).to.equal('div'))
+      it('and: the instance has entered attributes', () => expect(div.attrs).to.deep.equal({}))
+      it('and: the instance has entered children', () => expect(div.children).to.deep.equal(['content']))
     })
 
-    describe('when: it is constructed without attrs and children', div => {
+    describe('given: it is constructed without attrs and children', div => {
       beforeEach(() => (div = rawComponent('div')))
       it('then: the instance has a render method', () => expect(div.render).to.be.a('function'))
+      it('and: the instance has a entered nodeName', () => expect(div.nodeName).to.equal('div'))
+      it('and: the instance has entered attributes', () => expect(div.attrs).to.deep.equal({}))
+      it('and: the instance has entered children', () => expect(div.children).to.deep.equal([]))
     })
 
-    describe('when: it is constructed with certain node name value', (div, span, foo, bar) => {
+    describe('given: it is constructed with certain node name value', (div, span, foo, bar) => {
       beforeEach(() => {
         div = rawComponent('div')({})()
         span = rawComponent('span')({})()
@@ -323,7 +334,6 @@ describe('RawComponent', () => {
           })
 
           it('then: elements around and between arrays are preserved', () => {
-            console.log(appContainer.innerHTML)
             expect(appContainer.childNodes[0]).to.equal(out1)
             expect(appContainer.childNodes[1]).to.equal(out2)
             expect(appContainer.childNodes[10]).to.equal(out3)
@@ -332,9 +342,9 @@ describe('RawComponent', () => {
             expect(appContainer.childNodes[21]).to.equal(out6)
           })
 
-          it(`then: elements in the new child arrays are matched
-            with existing sets of elements rendered from arrays in the previous render,
-            in order from start.`, () => {
+          it('then: elements in the new child arrays are matched'+
+            'with existing sets of elements rendered from arrays in the previous render,'+
+            'in order from start.', () => {
             expect(appContainer.childNodes[2]).to.equal(in1)
             expect(appContainer.childNodes[3]).to.equal(in2)
             expect(appContainer.childNodes[4]).to.equal(in3)
