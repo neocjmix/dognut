@@ -1,10 +1,14 @@
 {
   "name": "dognut",
   "version": "1.0.0",
-  "description": "document object generator",
-  "main": "index.js",
+  "description": "DOM renderer with no XML-like expression",
+  "main": "lib/index.js",
   "author": "Chanjin Park <frank.park@kakaocorp.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/neocjmix/dognut.git"
+  },
   "devDependencies": {
     "chai": "^4.2.0",
     "esm": "^3.2.25",
