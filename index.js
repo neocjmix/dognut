@@ -1,1 +1,1 @@
-export * from './core/RawComponent'
+export {rawComponent, CHILD_INDEX} from './core/RawComponent'
