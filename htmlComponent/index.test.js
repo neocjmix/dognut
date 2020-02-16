@@ -1,5 +1,5 @@
 import jsdom from 'jsdom-global'
-import sampleComponent from './htmlElements.test.sample'
+import sampleComponent from './index.test.sample'
 import fs from 'fs'
 
 const sampleResult = fs.readFileSync(__dirname + '/htmlElements.test.sample.html', 'utf8')

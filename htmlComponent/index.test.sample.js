@@ -106,7 +106,7 @@ import {
   $variable,
   $video,
   $wbr
-} from './htmlElements.js'
+} from '.'
 
 
 export default $div(
