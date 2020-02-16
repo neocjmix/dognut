@@ -96,15 +96,16 @@ const updateChildren = (container, newChildrenGroup) => {
   flatten(oldChildrenLeftUnmatched).forEach(childNode => childNode.remove())
 }
 
-const _rawComponent = (namespaceURI, nodeName, attrs = {}, children = []) => {
+const _rawComponent = (nodeName, namespaceURI, attrs = {}, children = []) => {
   return {
     nodeName,
+    namespaceURI,
     attrs,
     children,
     render(container) {
       if (!container) {
-        container = namespaceURI && document.createElementNS
-          ? document.createElementNS(namespaceURI, this.nodeName)
+        container = (this.namespaceURI && document.createElementNS)
+          ? document.createElementNS(this.namespaceURI, this.nodeName)
           : this.nodeName === '#text'
             ? document.createTextNode(this.children[0])
             : document.createElement(this.nodeName)
@@ -135,17 +136,17 @@ const isChildrenArgs = args => {
 
 const isTemplateLiteralArgs = args => Array.isArray(args[0]) && args[0].raw != null
 
-const initWithNodeNameAndAttrs = (nodeName, attrs) => (...children) => _rawComponent(null, nodeName, attrs, children)
+const initWithNodeNameAndAttrs = (nodeName, namespaceURI, attrs) => (...children) => _rawComponent(nodeName, namespaceURI, attrs, children)
 
-const initWithNodeName = nodeName => (...args) => {
+const initWithNodeName = (nodeName, namespaceURI) => (...args) => {
   if(isChildrenArgs(args)){
-    return _rawComponent(null, nodeName, {}, args)
+    return _rawComponent(nodeName, namespaceURI, {}, args)
   }
   const attrs = isTemplateLiteralArgs(args) ? parseAbbr(trace(...args)) : args[0]
-  return Object.assign(initWithNodeNameAndAttrs(nodeName, attrs), _rawComponent(null, nodeName, attrs))
+  return Object.assign(initWithNodeNameAndAttrs(nodeName, namespaceURI, attrs), _rawComponent(nodeName, namespaceURI, attrs))
 }
 
-const init = (nodeName, namespaceURI) => Object.assign(initWithNodeName(nodeName), _rawComponent(namespaceURI, nodeName))
+const init = (nodeName, namespaceURI) => Object.assign(initWithNodeName(nodeName, namespaceURI), _rawComponent(nodeName, namespaceURI))
 
 const textNode = init('#text')
 
