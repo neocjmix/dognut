@@ -12,6 +12,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "esm": "^3.2.25",
+    "js-combinatorics": "^0.5.5",
     "jsdom": "15.2.1",
     "jsdom-global": "3.0.2",
     "mocha": "^6.2.2"

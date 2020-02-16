@@ -1,4 +1,5 @@
 import {flatten} from './common.js'
+import {parseAbbr, trace} from './common'
 
 const CHILD_INDEX = Symbol('childIndex')
 const NO_OLD_NODE = Symbol('noOldNode')
@@ -125,19 +126,23 @@ const _rawComponent = (namespaceURI, nodeName, attrs = {}, children = []) => {
   }
 }
 
-function isChildrenArgs(args) {
+const isChildrenArgs = args => {
   if (args[0] == null) return false // noargs
   if (typeof args[0] === 'string') return true // textNode
   if (typeof args[0].render === 'function') return true // childComponent
   return false
 }
 
+const isTemplateLiteralArgs = args => Array.isArray(args[0]) && args[0].raw != null
+
 const initWithNodeNameAndAttrs = (nodeName, attrs) => (...children) => _rawComponent(null, nodeName, attrs, children)
 
 const initWithNodeName = nodeName => (...args) => {
-  return isChildrenArgs(args)
-    ? _rawComponent(null, nodeName, {}, args)
-    : Object.assign(initWithNodeNameAndAttrs(nodeName, args[0]), _rawComponent(null, nodeName, args[0]))
+  if(isChildrenArgs(args)){
+    return _rawComponent(null, nodeName, {}, args)
+  }
+  const attrs = isTemplateLiteralArgs(args) ? parseAbbr(trace(...args)) : args[0]
+  return Object.assign(initWithNodeNameAndAttrs(nodeName, attrs), _rawComponent(null, nodeName, attrs))
 }
 
 const init = (nodeName, namespaceURI) => Object.assign(initWithNodeName(nodeName), _rawComponent(namespaceURI, nodeName))
