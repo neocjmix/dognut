@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "DOM renderer with no XML-like expression",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "author": "Chanjin Park <frank.park@kakaocorp.com>",
   "license": "MIT",
   "repository": {
