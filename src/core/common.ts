@@ -27,8 +27,8 @@ const parseAbbr = expression => {
     }))
 }
 
-const trace = (template, ...args) => template
+const parseTemplate = (template, ...args) => template
   .map((text, index) => text + (args.length > index ? args[index] : ''))
   .join('')
 
-export {flatten, parseAbbr, trace}
+export {flatten, parseAbbr, parseTemplate}

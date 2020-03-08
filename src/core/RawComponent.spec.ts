@@ -1,14 +1,15 @@
 import jsdom from 'jsdom-global'
 import chai from 'chai'
-import {rawComponent} from './RawComponent'
+import {rawComponent} from "./RawComponent";
 
 const expect = chai.expect
 
 describe('RawComponent', () => {
   describe('constructing', () => {
 
-    describe('given: it is constructed with selector-styled abbreviation', div => {
-      describe('and: the selector-styled abbreviation does not include place holders', div => {
+    describe('given: it is constructed with selector-styled abbreviation', () => {
+      describe('and: the selector-styled abbreviation does not include place holders', () => {
+        let div
         beforeEach(() => (div = rawComponent('div')`:text.test-class1.test-class2#test-id[value=testValue]`))
 
         describe('and: with no children', () => {
@@ -37,7 +38,8 @@ describe('RawComponent', () => {
         })
       })
 
-      describe('and: the selector-styled abbreviation includes place holders', div => {
+      describe('and: the selector-styled abbreviation includes place holders', () => {
+        let div
         beforeEach(() => (div = rawComponent('div')`:${'text'}.${'test-class1'}.${'test-class2'}#${'test-id'}[${'value'}=${'testValue'}]`))
 
         describe('and: with no children', () => {
@@ -68,7 +70,8 @@ describe('RawComponent', () => {
 
     })
 
-    describe('given: it is constructed with attrs', div => {
+    describe('given: it is constructed with attrs', () => {
+      let div
       beforeEach(() => (div = rawComponent('div')({ class : 'test'})))
 
       describe('and: with no children', () => {
@@ -87,7 +90,8 @@ describe('RawComponent', () => {
       })
     })
 
-    describe('given: it is constructed without attrs', div => {
+    describe('given: it is constructed without attrs', () => {
+      let div
       beforeEach(() => (div = rawComponent('div')))
 
       describe('and: with no children', () => {
@@ -106,7 +110,8 @@ describe('RawComponent', () => {
       })
     })
 
-    describe('given: it is constructed with certain node name value', (div, span, foo, bar) => {
+    describe('given: it is constructed with certain node name value', () => {
+      let div, span, foo, bar
       beforeEach(() => {
         div = rawComponent('div')({})()
         span = rawComponent('span')({})()
@@ -124,7 +129,8 @@ describe('RawComponent', () => {
   })
 
   describe('given: there is an app container element having default content, Div raw component and Span raw component',
-    (cleanup, appContainer, Div, Span) => {
+    () => {
+    let cleanup, appContainer, Div, Span
       beforeEach('setup app container and raw components', () => {
         Div = rawComponent('div')
         Span = rawComponent('span')

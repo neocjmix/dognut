@@ -2,7 +2,7 @@
   "name": "dognut",
   "version": "1.0.0",
   "description": "DOM renderer with no XML-like expression",
-  "main": "./index.js",
+  "main": "lib/index.js",
   "author": "Chanjin Park <frank.park@kakaocorp.com>",
   "license": "MIT",
   "repository": {
@@ -10,14 +10,24 @@
     "url": "https://github.com/neocjmix/dognut.git"
   },
   "devDependencies": {
+    "@types/mocha": "^7.0.1",
+    "@types/node": "^13.7.7",
     "chai": "^4.2.0",
     "esm": "^3.2.25",
     "js-combinatorics": "^0.5.5",
     "jsdom": "15.2.1",
     "jsdom-global": "3.0.2",
-    "mocha": "^6.2.2"
+    "mocha": "^6.2.2",
+    "ts-loader": "^6.2.1",
+    "ts-mocha": "^6.0.0",
+    "typescript": "^3.8.3"
+  },
+  "scripts": {
+    "build": "tsc"
   },
   "mocha": {
-    "require": "esm"
+    "require": [
+      "ts-mocha"
+    ]
   }
 }

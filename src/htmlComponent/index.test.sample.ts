@@ -106,7 +106,7 @@ import {
   $variable,
   $video,
   $wbr
-} from '.'
+} from './index'
 
 
 export default $div(
@@ -266,8 +266,8 @@ function helloworld{
             $tr($th('row1'), $td('-'), $td('-'), $td('-'), $td('-')),
           ),
           $thead(
-            $tr(th, $th('col1'), $th('col2'), $th('col3'), $th('col4')),
-            tr,
+            $tr($th, $th('col1'), $th('col2'), $th('col3'), $th('col4')),
+            $tr,
           ),
           $tfoot(
             $tr($th('summary'), $td('-'), $td('-'), $td('-'), $td('-')),
