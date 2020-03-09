@@ -1,4 +1,4 @@
-import {parseAbbr} from './common'
+import {parseAbbr} from '../../core/common'
 import chai from 'chai'
 import Combinatorics from 'js-combinatorics'
 

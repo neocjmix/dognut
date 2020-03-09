@@ -1,6 +1,6 @@
 import jsdom from 'jsdom-global'
 import chai from 'chai'
-import {rawComponent} from "./RawComponent";
+import {rawComponent} from "../../core/RawComponent";
 
 const expect = chai.expect
 

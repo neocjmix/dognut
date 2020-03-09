@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var RawComponent_js_1 = require("../core/RawComponent.js");
+var RawComponent_js_1 = require("./core/RawComponent.js");
 exports.$a = RawComponent_js_1.rawComponent('a', 'http://www.w3.org/2000/svg');
 exports.$animate = RawComponent_js_1.rawComponent('animate', 'http://www.w3.org/2000/svg');
 exports.$animateMotion = RawComponent_js_1.rawComponent('animateMotion', 'http://www.w3.org/2000/svg');
@@ -70,4 +70,4 @@ exports.$unknown = RawComponent_js_1.rawComponent('unknown', 'http://www.w3.org/
 exports.$use = RawComponent_js_1.rawComponent('use', 'http://www.w3.org/2000/svg');
 exports.$video = RawComponent_js_1.rawComponent('video', 'http://www.w3.org/2000/svg');
 exports.$view = RawComponent_js_1.rawComponent('view', 'http://www.w3.org/2000/svg');
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=svgComponent.js.map

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var RawComponent_js_1 = require("../core/RawComponent.js");
+var RawComponent_js_1 = require("./core/RawComponent.js");
 // Document metadata
 exports.$link = RawComponent_js_1.rawComponent('link');
 exports.$style = RawComponent_js_1.rawComponent('style');
@@ -122,4 +122,4 @@ exports.$summary = RawComponent_js_1.rawComponent('summary');
 // Web Components
 exports.$slot = RawComponent_js_1.rawComponent('slot');
 exports.$template = RawComponent_js_1.rawComponent('template');
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=htmlComponent.js.map
