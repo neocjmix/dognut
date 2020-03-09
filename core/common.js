@@ -25,10 +25,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var BETWEEN_BRACKET_AND_EQUAL = /(?<=\[).*?(?==)/;
 var BETWEEN_EQUAL_AND_BRACKET = /(?<==).*?(?=])/;
 var EVERY_PARTS_STARTS_WITH_DOT_HASH_COLON_OR_BETWEEN_BRACKET = /([\.#:].*?((?=[\.#:[])|$)|\[.*?])/g;
-var isFlatMappable = function (obj) { return obj && obj.flatMap && typeof obj.flatMap === 'function'; };
-var flatten = function (maybeArray) { return isFlatMappable(maybeArray)
-    ? maybeArray.flatMap(function (element) { return flatten(element); })
-    : [maybeArray]; };
+var isFlatMappable = function (object) { return object && object.flatMap && typeof object.flatMap === 'function'; };
+function flatten(maybeArray) {
+    if (isFlatMappable(maybeArray)) {
+        return maybeArray.flatMap(function (element) { return flatten(element); });
+    }
+    else {
+        return [maybeArray];
+    }
+}
 exports.flatten = flatten;
 var parseAbbr = function (expression) {
     var AttrExpMap = {
@@ -46,12 +51,12 @@ var parseAbbr = function (expression) {
         },
         '[': function (exp) {
             var _a;
-            return (_a = {}, _a[exp.match(BETWEEN_BRACKET_AND_EQUAL)[0]] = exp.match(BETWEEN_EQUAL_AND_BRACKET)[0], _a);
+            var _b, _c;
+            return (_a = {}, _a[((_b = exp.match(BETWEEN_BRACKET_AND_EQUAL)) === null || _b === void 0 ? void 0 : _b[0]) || ''] = (_c = exp.match(BETWEEN_EQUAL_AND_BRACKET)) === null || _c === void 0 ? void 0 : _c[0], _a);
         },
     };
-    var parts = expression.match(EVERY_PARTS_STARTS_WITH_DOT_HASH_COLON_OR_BETWEEN_BRACKET);
-    return parts
-        .map(function (part) { return AttrExpMap[part[0]](part); })
+    return (expression.match(EVERY_PARTS_STARTS_WITH_DOT_HASH_COLON_OR_BETWEEN_BRACKET) || [])
+        .map(function (part) { var _a; return (AttrExpMap[(((_a = part) === null || _a === void 0 ? void 0 : _a[0]) || '')] || (function () { return ({}); }))(part); })
         .reduce(function (_a, _b) {
         var classValue1 = _a.class, attrs1 = __rest(_a, ["class"]);
         var classValue2 = _b.class, attrs2 = __rest(_b, ["class"]);

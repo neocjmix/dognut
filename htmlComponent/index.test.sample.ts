@@ -108,7 +108,6 @@ import {
   $wbr
 } from './index'
 
-
 export default $div(
   $header(
     $hgroup(

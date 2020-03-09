@@ -40,7 +40,11 @@ describe('RawComponent', () => {
 
       describe('and: the selector-styled abbreviation includes place holders', () => {
         let div
-        beforeEach(() => (div = rawComponent('div')`:${'text'}.${'test-class1'}.${'test-class2'}#${'test-id'}[${'value'}=${'testValue'}]`))
+        beforeEach(() => {
+          const initiatorWithChildrenOrAttr = rawComponent('div');
+          div = initiatorWithChildrenOrAttr`:${'text'}.${'test-class1'}.${'test-class2'}#${'test-id'}[${'value'}=${'testValue'}]`;
+          return div;
+        })
 
         describe('and: with no children', () => {
           it('then: the instance has a render method', () => expect(div.render).to.be.a('function'))

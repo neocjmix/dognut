@@ -2,9 +2,9 @@
   "name": "dognut",
   "version": "1.0.0",
   "description": "DOM renderer with no XML-like expression",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "author": "Chanjin Park <frank.park@kakaocorp.com>",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "author": "Chanjin Park <neocjmix@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
