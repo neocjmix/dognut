@@ -107,3 +107,4 @@ export declare const $menu: import("./core/RawComponent.js").ComponentWithoutAtt
 export declare const $summary: import("./core/RawComponent.js").ComponentWithoutAttrAndChildren;
 export declare const $slot: import("./core/RawComponent.js").ComponentWithoutAttrAndChildren;
 export declare const $template: import("./core/RawComponent.js").ComponentWithoutAttrAndChildren;
+//# sourceMappingURL=htmlComponent.d.ts.map

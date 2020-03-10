@@ -67,3 +67,4 @@ export declare const $unknown: import("./core/RawComponent.js").ComponentWithout
 export declare const $use: import("./core/RawComponent.js").ComponentWithoutAttrAndChildren;
 export declare const $video: import("./core/RawComponent.js").ComponentWithoutAttrAndChildren;
 export declare const $view: import("./core/RawComponent.js").ComponentWithoutAttrAndChildren;
+//# sourceMappingURL=svgComponent.d.ts.map

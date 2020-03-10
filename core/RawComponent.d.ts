@@ -6,13 +6,13 @@ interface DognutNode extends Node {
     [CHILD_INDEX]: number;
     remove: () => void;
 }
-interface ComponentWithoutAttrAndChildren extends Function, Component {
+interface ComponentWithAttrs extends Component {
     (...children: Child[]): Component;
-    (attrs: Attrs): ComponentWithAttrs;
-    (abbrebiation: TemplateStringsArray, ...variables: any[]): ComponentWithAttrs;
 }
-interface ComponentWithAttrs extends Function, Component {
+interface ComponentWithoutAttrAndChildren extends Component {
+    (attrs: Attrs): ComponentWithAttrs;
     (...children: Child[]): Component;
+    (abbrebiation: TemplateStringsArray, ...variables: any[]): ComponentWithAttrs;
 }
 interface Component {
     nodeName: string;
@@ -23,3 +23,4 @@ interface Component {
 }
 declare const init: (nodeName: string, namespaceURI?: string | undefined) => ComponentWithoutAttrAndChildren;
 export { init as rawComponent, CHILD_INDEX, DognutNode, ComponentWithoutAttrAndChildren, ComponentWithAttrs, Component, Child, Attrs, HTMLNode };
+//# sourceMappingURL=RawComponent.d.ts.map
