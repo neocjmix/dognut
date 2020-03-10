@@ -1,3 +1,5 @@
 dognut.iml
 tsconfig.json
+tsconfig.package.json
 spec
+src

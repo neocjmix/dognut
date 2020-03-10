@@ -23,4 +23,3 @@ interface Component {
 }
 declare const init: (nodeName: string, namespaceURI?: string | undefined) => ComponentWithoutAttrAndChildren;
 export { init as rawComponent, CHILD_INDEX, DognutNode, ComponentWithoutAttrAndChildren, ComponentWithAttrs, Component, Child, Attrs, HTMLNode };
-//# sourceMappingURL=RawComponent.d.ts.map

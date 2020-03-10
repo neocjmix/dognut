@@ -1,6 +1,7 @@
 "use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
 Object.defineProperty(exports, "__esModule", { value: true });
-var RawComponent_1 = require("./core/RawComponent");
-exports.rawComponent = RawComponent_1.rawComponent;
-exports.CHILD_INDEX = RawComponent_1.CHILD_INDEX;
+__export(require("./dist"));
 //# sourceMappingURL=index.js.map

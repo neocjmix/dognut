@@ -106,7 +106,7 @@ import {
   $variable,
   $video,
   $wbr
-} from '../../htmlComponent'
+} from '../../src/htmlComponent'
 
 export default $div(
   $header(

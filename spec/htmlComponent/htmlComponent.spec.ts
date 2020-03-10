@@ -5,7 +5,7 @@ import * as fs from "fs";
 const sampleResult = fs.readFileSync(__dirname + '/htmlElements.test.sample.html', 'utf8');
 describe('RawComponents for html5 tags', () => {
   describe('render', () => {
-    let cleanup, expected, actual;
+    let cleanup: any, expected, actual;
     beforeEach('setup app container', () => {
       cleanup = jsdom();
       document.body.innerHTML = `<div id="expected">${sampleResult}</div><div id="actual"></div>`;

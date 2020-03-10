@@ -22,8 +22,10 @@ interface ComponentWithAttrs extends Component {
 }
 
 interface ComponentWithoutAttrAndChildren extends Component {
-    (attrs:Attrs): ComponentWithAttrs;
+    (attrs: Attrs): ComponentWithAttrs;
+
     (...children: Child[]): Component;
+
     (abbrebiation: TemplateStringsArray, ...variables: any[]): ComponentWithAttrs;
 }
 
