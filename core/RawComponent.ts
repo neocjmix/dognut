@@ -17,16 +17,14 @@ interface DognutNode extends Node {
     remove: () => void
 }
 
-interface ComponentWithoutAttrAndChildren extends Function, Component {
-    (...children: Child[]): Component;
-
-    (attrs:Attrs): ComponentWithAttrs;
-
-    (abbrebiation: TemplateStringsArray, ...variables: any[]): ComponentWithAttrs;
+interface ComponentWithAttrs extends Component {
+    (...children: Child[]): Component
 }
 
-interface ComponentWithAttrs extends Function, Component {
-    (...children: Child[]): Component
+interface ComponentWithoutAttrAndChildren extends Component {
+    (attrs:Attrs): ComponentWithAttrs;
+    (...children: Child[]): Component;
+    (abbrebiation: TemplateStringsArray, ...variables: any[]): ComponentWithAttrs;
 }
 
 interface Component {
@@ -210,8 +208,8 @@ const decorateWithAttrOrChildrenSetter = (component: Component): ComponentWithou
     return Object.assign(attrOrChildrenSetter, component);
 };
 
-const init = (nodeName: string, namespaceURI?: string) =>
-    decorateWithAttrOrChildrenSetter(_rawComponent(nodeName, namespaceURI))
+const init = (nodeName: string, namespaceURI?: string): ComponentWithoutAttrAndChildren =>
+    decorateWithAttrOrChildrenSetter(_rawComponent(nodeName, namespaceURI));
 
 const textNode = init('#text');
 
