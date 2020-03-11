@@ -4,17 +4,10 @@ declare type Attrs = {
     [key: string]: any;
 };
 declare type HTMLNode = Element | Text;
+declare type RawComponentFactory = (nodeName: string, namespaceURI?: string) => AbbrAttrChildrenAddable & Component;
 interface DognutNode extends Node {
     [CHILD_INDEX]: number;
     remove: () => void;
-}
-interface ComponentWithAttrs extends Component {
-    (...children: Child[]): Component;
-}
-interface ComponentWithoutAttrAndChildren extends Component {
-    (attrs: Attrs): ComponentWithAttrs;
-    (...children: Child[]): Component;
-    (abbrebiation: TemplateStringsArray, ...variables: any[]): ComponentWithAttrs;
 }
 interface Component {
     nodeName: string;
@@ -23,5 +16,15 @@ interface Component {
     children: (Component | string)[];
     render: (container?: HTMLNode) => HTMLNode;
 }
-declare const init: (nodeName: string, namespaceURI?: string | undefined) => ComponentWithoutAttrAndChildren;
-export { init as rawComponent, CHILD_INDEX, DognutNode, ComponentWithoutAttrAndChildren, ComponentWithAttrs, Component, Child, Attrs, HTMLNode };
+interface ChildrenAddable {
+    (...children: Child[]): Component;
+}
+interface AttrChildrenAddable extends ChildrenAddable {
+    (attrs: Attrs): ChildrenAddable & Component;
+}
+interface AbbrAttrChildrenAddable extends AttrChildrenAddable {
+    (abbrebiation: TemplateStringsArray, ...variables: any[]): ChildrenAddable & Component;
+}
+declare const rawComponent: RawComponentFactory;
+export { CHILD_INDEX, rawComponent };
+export { Child, Attrs, HTMLNode, DognutNode, ChildrenAddable, AbbrAttrChildrenAddable, Component };

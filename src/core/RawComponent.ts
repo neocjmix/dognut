@@ -9,24 +9,13 @@ enum nodeCompareResult {
 }
 
 type Child = Component | string;
-type Attrs = { [key:string]:any };
+type Attrs = { [key: string]: any };
 type HTMLNode = Element | Text
+type RawComponentFactory = (nodeName: string, namespaceURI?: string) => AbbrAttrChildrenAddable & Component
 
 interface DognutNode extends Node {
     [CHILD_INDEX]: number,
     remove: () => void
-}
-
-interface ComponentWithAttrs extends Component {
-    (...children: Child[]): Component
-}
-
-interface ComponentWithoutAttrAndChildren extends Component {
-    (attrs: Attrs): ComponentWithAttrs;
-
-    (...children: Child[]): Component;
-
-    (abbrebiation: TemplateStringsArray, ...variables: any[]): ComponentWithAttrs;
 }
 
 interface Component {
@@ -37,9 +26,20 @@ interface Component {
     render: (container?: HTMLNode) => HTMLNode
 }
 
+interface ChildrenAddable {
+    (...children: Child[]): Component
+}
+
+interface AttrChildrenAddable extends ChildrenAddable {
+    (attrs: Attrs): ChildrenAddable & Component;
+}
+
+interface AbbrAttrChildrenAddable extends AttrChildrenAddable {
+    (abbrebiation: TemplateStringsArray, ...variables: any[]): ChildrenAddable & Component;
+}
 
 const normalizeToComponent = (child: Child) => {
-    if (typeof child === 'string') return textNode(child);
+    if (typeof child === 'string') return rawComponent('#text')(child);
     return child
 };
 
@@ -136,7 +136,7 @@ const updateChildren = (container: Element, newChildrenGroup: any[]) => {
     flatten(oldChildrenLeftUnmatched).forEach(childNode => childNode.remove())
 };
 
-const _rawComponent = (nodeName: string, namespaceURI?: string, attrs?: {}, children?: Child[]): Component => {
+const createComponent = (nodeName: string, namespaceURI?: string, attrs?: {}, children?: Child[]): Component => {
     return {
         nodeName,
         namespaceURI,
@@ -179,50 +179,38 @@ const _rawComponent = (nodeName: string, namespaceURI?: string, attrs?: {}, chil
     }
 };
 
-const isTemplateLiteralArgs = (args: any): args is TemplateStringsArray => Array.isArray(args[0]) && 'raw' in args[0];
+const isTemplateLiteralArgs = (args: any) => Array.isArray(args[0]) && 'raw' in args[0];
 
-function isInstancesOfChildren(object: any[]): object is Child[] {
+const isChildrenArgs = (object: any[]) => {
     if (object[0] == null) return false; // noargs
     if (typeof object[0] === 'string') return true; // textNode
     if (typeof object[0].render === 'function') return true; // childComponent
     return false
-}
-
-const decorateWithChildrenSetter = (component: Component): ComponentWithAttrs => {
-    const childrenSetter = (...children: Child[]) => _rawComponent(component.nodeName, component.namespaceURI, component.attrs, children);
-    return Object.assign(childrenSetter, component);
 };
 
+const childrenSetterFor = (component: Component) => (...children: Child[]) =>
+    createComponent(component.nodeName, component.namespaceURI, component.attrs, children);
 
-const decorateWithAttrOrChildrenSetter = (component: Component): ComponentWithoutAttrAndChildren => {
-    const attrOrChildrenSetter = (...args: any[]): any => {
-        if (isInstancesOfChildren(args)) {
-            return _rawComponent(component.nodeName, component.namespaceURI, {}, []);
-        }
-        if (isTemplateLiteralArgs(args)) {
-            const attrsFromAbbr = parseAbbr(parseTemplate(args[0], ...args.slice(1)));
-            const componentWithAttrs = _rawComponent(component.nodeName, component.namespaceURI, attrsFromAbbr, []);
-            return decorateWithChildrenSetter(componentWithAttrs);
-        }
-        const componentWithAttrs = _rawComponent(component.nodeName, component.namespaceURI, args[0], []);
-        return decorateWithChildrenSetter(componentWithAttrs);
-    };
-    return Object.assign(attrOrChildrenSetter, component);
+const attrOrChildrenSetterFor = (component: Component) => (...args: any[]): any => {
+    if (isChildrenArgs(args)) {
+        return createComponent(component.nodeName, component.namespaceURI, {}, args);
+    }
+    if (isTemplateLiteralArgs(args)) {
+        const attrsFromAbbr = parseAbbr(parseTemplate(args[0], ...args.slice(1)));
+        const componentWithAttrs = createComponent(component.nodeName, component.namespaceURI, attrsFromAbbr, []);
+        return Object.assign(childrenSetterFor(componentWithAttrs), componentWithAttrs);
+    }
+    // args is Attr or none
+    const componentWithAttrs = createComponent(component.nodeName, component.namespaceURI, args[0], []);
+    return decorate(childrenSetterFor(componentWithAttrs), componentWithAttrs);
 };
 
-const init = (nodeName: string, namespaceURI?: string): ComponentWithoutAttrAndChildren =>
-    decorateWithAttrOrChildrenSetter(_rawComponent(nodeName, namespaceURI));
+const decorate = <T,U>(original:T, decorator: U):U & T => Object.assign(original, decorator);
 
-const textNode = init('#text');
+const rawComponent: RawComponentFactory = (nodeName, namespaceURI) => {
+    const component:Component = createComponent(nodeName, namespaceURI);
+    return decorate(attrOrChildrenSetterFor(component), component);
+};
 
-export {
-    init as rawComponent,
-    CHILD_INDEX,
-    DognutNode,
-    ComponentWithoutAttrAndChildren,
-    ComponentWithAttrs,
-    Component,
-    Child,
-    Attrs,
-    HTMLNode
-}
+export {CHILD_INDEX, rawComponent}
+export {Child, Attrs, HTMLNode, DognutNode, ChildrenAddable, AbbrAttrChildrenAddable, Component}

@@ -9,7 +9,7 @@ describe('RawComponent', () => {
 
         describe('given: it is constructed with selector-styled abbreviation', () => {
             describe('and: the selector-styled abbreviation does not include place holders', () => {
-                let div: any;
+                let div;
                 beforeEach(() => (div = rawComponent('div')`:text.test-class1.test-class2#test-id[value=testValue]`));
 
                 describe('and: with no children', () => {
@@ -39,7 +39,7 @@ describe('RawComponent', () => {
             });
 
             describe('and: the selector-styled abbreviation includes place holders', () => {
-                let div: any;
+                let div;
                 beforeEach(() => {
                     const initiatorWithChildrenOrAttr = rawComponent('div');
                     div = initiatorWithChildrenOrAttr`:${'text'}.${'test-class1'}.${'test-class2'}#${'test-id'}[${'value'}=${'testValue'}]`;
@@ -75,7 +75,7 @@ describe('RawComponent', () => {
         });
 
         describe('given: it is constructed with attrs', () => {
-            let div: any;
+            let div;
             beforeEach(() => (div = rawComponent('div')({class: 'test'})));
 
             describe('and: with no children', () => {
@@ -95,7 +95,7 @@ describe('RawComponent', () => {
         });
 
         describe('given: it is constructed without attrs', () => {
-            let div: any;
+            let div;
             beforeEach(() => (div = rawComponent('div')));
 
             describe('and: with no children', () => {
@@ -115,7 +115,7 @@ describe('RawComponent', () => {
         });
 
         describe('given: it is constructed with certain node name value', () => {
-            let div: any, span: any, foo: any, bar: any;
+            let div, span, foo, bar;
             beforeEach(() => {
                 div = rawComponent('div')({})();
                 span = rawComponent('span')({})();
@@ -134,7 +134,7 @@ describe('RawComponent', () => {
 
     describe('given: there is an app container element having default content, Div raw component and Span raw component',
         () => {
-            let cleanup: any, appContainer: any, Div: any, Span: any;
+            let cleanup, appContainer, Div, Span;
             beforeEach('setup app container and raw components', () => {
                 Div = rawComponent('div');
                 Span = rawComponent('span');
@@ -326,20 +326,20 @@ describe('RawComponent', () => {
             });
 
             describe('given: arrayed children is rendered on container', () => {
-                let out1: any,
-                    out2: any,
-                    in1: any,
-                    in2: any,
-                    in3: any,
-                    in4: any,
-                    out3: any,
-                    out4: any,
-                    in5: any,
-                    in6: any,
-                    in7: any,
-                    in8: any,
-                    out5: any,
-                    out6: any;
+                let out1,
+                    out2,
+                    in1,
+                    in2,
+                    in3,
+                    in4,
+                    out3,
+                    out4,
+                    in5,
+                    in6,
+                    in7,
+                    in8,
+                    out5,
+                    out6;
 
                 beforeEach(() => {
                     Div({class: 'out'})(

@@ -18,7 +18,7 @@ var nodeCompareResult;
 })(nodeCompareResult || (nodeCompareResult = {}));
 var normalizeToComponent = function (child) {
     if (typeof child === 'string')
-        return textNode(child);
+        return rawComponent('#text')(child);
     return child;
 };
 var updateAttrs = function (container, attrs) {
@@ -107,7 +107,7 @@ var updateChildren = function (container, newChildrenGroup) {
     var oldChildrenLeftUnmatched = oldChildrenGroupedByIndex.slice(newChildrenGroup.length);
     common_1.flatten(oldChildrenLeftUnmatched).forEach(function (childNode) { return childNode.remove(); });
 };
-var _rawComponent = function (nodeName, namespaceURI, attrs, children) {
+var createComponent = function (nodeName, namespaceURI, attrs, children) {
     return {
         nodeName: nodeName,
         namespaceURI: namespaceURI,
@@ -148,7 +148,7 @@ var _rawComponent = function (nodeName, namespaceURI, attrs, children) {
     };
 };
 var isTemplateLiteralArgs = function (args) { return Array.isArray(args[0]) && 'raw' in args[0]; };
-function isInstancesOfChildren(object) {
+var isChildrenArgs = function (object) {
     if (object[0] == null)
         return false; // noargs
     if (typeof object[0] === 'string')
@@ -156,39 +156,35 @@ function isInstancesOfChildren(object) {
     if (typeof object[0].render === 'function')
         return true; // childComponent
     return false;
-}
-var decorateWithChildrenSetter = function (component) {
-    var childrenSetter = function () {
-        var children = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            children[_i] = arguments[_i];
-        }
-        return _rawComponent(component.nodeName, component.namespaceURI, component.attrs, children);
-    };
-    return Object.assign(childrenSetter, component);
 };
-var decorateWithAttrOrChildrenSetter = function (component) {
-    var attrOrChildrenSetter = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        if (isInstancesOfChildren(args)) {
-            return _rawComponent(component.nodeName, component.namespaceURI, {}, []);
-        }
-        if (isTemplateLiteralArgs(args)) {
-            var attrsFromAbbr = common_1.parseAbbr(common_1.parseTemplate.apply(void 0, __spreadArrays([args[0]], args.slice(1))));
-            var componentWithAttrs_1 = _rawComponent(component.nodeName, component.namespaceURI, attrsFromAbbr, []);
-            return decorateWithChildrenSetter(componentWithAttrs_1);
-        }
-        var componentWithAttrs = _rawComponent(component.nodeName, component.namespaceURI, args[0], []);
-        return decorateWithChildrenSetter(componentWithAttrs);
-    };
-    return Object.assign(attrOrChildrenSetter, component);
+var childrenSetterFor = function (component) { return function () {
+    var children = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        children[_i] = arguments[_i];
+    }
+    return createComponent(component.nodeName, component.namespaceURI, component.attrs, children);
+}; };
+var attrOrChildrenSetterFor = function (component) { return function () {
+    var args = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        args[_i] = arguments[_i];
+    }
+    if (isChildrenArgs(args)) {
+        return createComponent(component.nodeName, component.namespaceURI, {}, args);
+    }
+    if (isTemplateLiteralArgs(args)) {
+        var attrsFromAbbr = common_1.parseAbbr(common_1.parseTemplate.apply(void 0, __spreadArrays([args[0]], args.slice(1))));
+        var componentWithAttrs_1 = createComponent(component.nodeName, component.namespaceURI, attrsFromAbbr, []);
+        return Object.assign(childrenSetterFor(componentWithAttrs_1), componentWithAttrs_1);
+    }
+    // args is Attr or none
+    var componentWithAttrs = createComponent(component.nodeName, component.namespaceURI, args[0], []);
+    return decorate(childrenSetterFor(componentWithAttrs), componentWithAttrs);
+}; };
+var decorate = function (original, decorator) { return Object.assign(original, decorator); };
+var rawComponent = function (nodeName, namespaceURI) {
+    var component = createComponent(nodeName, namespaceURI);
+    return decorate(attrOrChildrenSetterFor(component), component);
 };
-var init = function (nodeName, namespaceURI) {
-    return decorateWithAttrOrChildrenSetter(_rawComponent(nodeName, namespaceURI));
-};
-exports.rawComponent = init;
-var textNode = init('#text');
+exports.rawComponent = rawComponent;
 //# sourceMappingURL=RawComponent.js.map
