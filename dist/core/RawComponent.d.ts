@@ -1,6 +1,8 @@
 declare const CHILD_INDEX: unique symbol;
 declare type Child = Component | string;
-declare type Attrs = object;
+declare type Attrs = {
+    [key: string]: any;
+};
 declare type HTMLNode = Element | Text;
 interface DognutNode extends Node {
     [CHILD_INDEX]: number;

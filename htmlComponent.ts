@@ -1,1 +1,1 @@
-export * from './dist/htmlComponent'
+export * from './dist/htmlComponent';

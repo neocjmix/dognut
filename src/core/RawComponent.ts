@@ -9,7 +9,7 @@ enum nodeCompareResult {
 }
 
 type Child = Component | string;
-type Attrs = object;
+type Attrs = { [key:string]:any };
 type HTMLNode = Element | Text
 
 interface DognutNode extends Node {

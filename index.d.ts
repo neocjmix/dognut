@@ -1,1 +1,1 @@
-export * from './dist';
+export { rawComponent, CHILD_INDEX } from './dist/core/RawComponent';
