@@ -21,9 +21,10 @@ interface DognutNode extends Node {
 interface Component {
     nodeName: string,
     namespaceURI?: string,
-    attrs: object,
+    attrs: Attrs,
     children: (Component | string)[],
-    render: (container?: HTMLNode) => HTMLNode
+    render: (container?: HTMLNode) => HTMLNode,
+    toString: () => string
 }
 
 interface ChildrenAddable {
@@ -136,45 +137,61 @@ const updateChildren = (container: Element, newChildrenGroup: any[]) => {
     flatten(oldChildrenLeftUnmatched).forEach(childNode => childNode.remove())
 };
 
-const createComponent = (nodeName: string, namespaceURI?: string, attrs?: {}, children?: Child[]): Component => {
+const createComponent = (nodeName: string, namespaceURI?: string, attrs?: Attrs, children?: Child[]): Component => {
     return {
         nodeName,
         namespaceURI,
         attrs: attrs || {},
         children: children || [],
+        toString() {
+            return [
+                [this.nodeName, this.attrs.id].filter(a => a).join('#'),
+                this.attrs.class
+            ].filter(a => a).join('.');
+        },
         render(container) {
-            if (!container) {
-                if (this.namespaceURI && document.createElementNS) {
-                    container = document.createElementNS(this.namespaceURI, this.nodeName)
-                } else {
-                    if (this.nodeName === '#text') {
-                        if (typeof this.children[0] !== 'string') {
-                            throw new Error('content of textnode should be string.')
-                        }
-                        container = document.createTextNode(this.children[0])
+            try {
+                if (!container) {
+                    if (this.namespaceURI && document.createElementNS) {
+                        container = document.createElementNS(this.namespaceURI, this.nodeName)
                     } else {
-                        container = document.createElement(this.nodeName)
+                        if (this.nodeName === '#text') {
+                            if (typeof this.children[0] !== 'string') {
+                                throw new Error('content of textnode should be string.')
+                            }
+                            container = document.createTextNode(this.children[0])
+                        } else {
+                            container = document.createElement(this.nodeName)
+                        }
                     }
                 }
-            }
 
-            if (compareNodeType(container, this.nodeName) !== nodeCompareResult.SAME_TYPE) {
-                throw new Error('container type is not match with given one')
-            }
-
-            if (container instanceof Element) {
-                updateAttrs(container, this.attrs);
-                updateChildren(container, this.children)
-            }
-
-            if (container instanceof Text && container.nodeValue !== this.children[0]) {
-                if (typeof this.children[0] !== 'string') {
-                    throw new Error('content of textnode should be string.')
+                if (compareNodeType(container, this.nodeName) !== nodeCompareResult.SAME_TYPE) {
+                    throw new Error('container type is not match with given one')
                 }
-                container.nodeValue = this.children[0]
-            }
 
-            return container
+                if (container instanceof Element) {
+                    updateAttrs(container, this.attrs);
+                    updateChildren(container, this.children)
+                }
+
+                if (container instanceof Text && container.nodeValue !== this.children[0]) {
+                    if (typeof this.children[0] !== 'string') {
+                        throw new Error('content of textnode should be string.')
+                    }
+                    container.nodeValue = this.children[0]
+                }
+
+                return container
+            } catch (e) {
+                const indentedMessage = (e.depth || ':\n') + e.message
+                    .split('\n')
+                    .map((s: string) => '  ' + s)
+                    .join('\n');
+                throw Object.assign(new Error(`\n${this}${indentedMessage}`), {
+                    depth: (e.depth || 0) + 1
+                })
+            }
         }
     }
 };
@@ -205,10 +222,10 @@ const attrOrChildrenSetterFor = (component: Component) => (...args: any[]): any 
     return decorate(childrenSetterFor(componentWithAttrs), componentWithAttrs);
 };
 
-const decorate = <T,U>(original:T, decorator: U):U & T => Object.assign(original, decorator);
+const decorate = <T, U>(original: T, decorator: U): U & T => Object.assign(original, decorator);
 
 const rawComponent: RawComponentFactory = (nodeName, namespaceURI) => {
-    const component:Component = createComponent(nodeName, namespaceURI);
+    const component: Component = createComponent(nodeName, namespaceURI);
     return decorate(attrOrChildrenSetterFor(component), component);
 };
 

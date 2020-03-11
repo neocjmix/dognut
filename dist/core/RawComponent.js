@@ -113,37 +113,54 @@ var createComponent = function (nodeName, namespaceURI, attrs, children) {
         namespaceURI: namespaceURI,
         attrs: attrs || {},
         children: children || [],
+        toString: function () {
+            return [
+                [this.nodeName, this.attrs.id].filter(function (a) { return a; }).join('#'),
+                this.attrs.class
+            ].filter(function (a) { return a; }).join('.');
+        },
         render: function (container) {
-            if (!container) {
-                if (this.namespaceURI && document.createElementNS) {
-                    container = document.createElementNS(this.namespaceURI, this.nodeName);
-                }
-                else {
-                    if (this.nodeName === '#text') {
-                        if (typeof this.children[0] !== 'string') {
-                            throw new Error('content of textnode should be string.');
-                        }
-                        container = document.createTextNode(this.children[0]);
+            try {
+                if (!container) {
+                    if (this.namespaceURI && document.createElementNS) {
+                        container = document.createElementNS(this.namespaceURI, this.nodeName);
                     }
                     else {
-                        container = document.createElement(this.nodeName);
+                        if (this.nodeName === '#text') {
+                            if (typeof this.children[0] !== 'string') {
+                                throw new Error('content of textnode should be string.');
+                            }
+                            container = document.createTextNode(this.children[0]);
+                        }
+                        else {
+                            container = document.createElement(this.nodeName);
+                        }
                     }
                 }
-            }
-            if (compareNodeType(container, this.nodeName) !== nodeCompareResult.SAME_TYPE) {
-                throw new Error('container type is not match with given one');
-            }
-            if (container instanceof Element) {
-                updateAttrs(container, this.attrs);
-                updateChildren(container, this.children);
-            }
-            if (container instanceof Text && container.nodeValue !== this.children[0]) {
-                if (typeof this.children[0] !== 'string') {
-                    throw new Error('content of textnode should be string.');
+                if (compareNodeType(container, this.nodeName) !== nodeCompareResult.SAME_TYPE) {
+                    throw new Error('container type is not match with given one');
                 }
-                container.nodeValue = this.children[0];
+                if (container instanceof Element) {
+                    updateAttrs(container, this.attrs);
+                    updateChildren(container, this.children);
+                }
+                if (container instanceof Text && container.nodeValue !== this.children[0]) {
+                    if (typeof this.children[0] !== 'string') {
+                        throw new Error('content of textnode should be string.');
+                    }
+                    container.nodeValue = this.children[0];
+                }
+                return container;
             }
-            return container;
+            catch (e) {
+                var indentedMessage = (e.depth || ':\n') + e.message
+                    .split('\n')
+                    .map(function (s) { return '  ' + s; })
+                    .join('\n');
+                throw Object.assign(new Error("\n" + this + indentedMessage), {
+                    depth: (e.depth || 0) + 1
+                });
+            }
         }
     };
 };

@@ -12,9 +12,10 @@ interface DognutNode extends Node {
 interface Component {
     nodeName: string;
     namespaceURI?: string;
-    attrs: object;
+    attrs: Attrs;
     children: (Component | string)[];
     render: (container?: HTMLNode) => HTMLNode;
+    toString: () => string;
 }
 interface ChildrenAddable {
     (...children: Child[]): Component;
