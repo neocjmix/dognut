@@ -1,5 +1,5 @@
 declare const CHILD_INDEX: unique symbol;
-declare type Child = Component | string;
+declare type Child = Component | string | boolean | undefined | null | number;
 declare type Attrs = {
     [key: string]: any;
 };
@@ -13,7 +13,7 @@ interface Component {
     nodeName: string;
     namespaceURI?: string;
     attrs: Attrs;
-    children: (Component | string)[];
+    children: Child[];
     render: (container?: HTMLNode) => HTMLNode;
     toString: () => string;
 }

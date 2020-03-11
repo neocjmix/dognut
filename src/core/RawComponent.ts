@@ -8,7 +8,7 @@ enum nodeCompareResult {
     DIFFERENT_TYPE,
 }
 
-type Child = Component | string;
+type Child = Component | string | boolean | undefined | null | number;
 type Attrs = { [key: string]: any };
 type HTMLNode = Element | Text
 type RawComponentFactory = (nodeName: string, namespaceURI?: string) => AbbrAttrChildrenAddable & Component
@@ -22,7 +22,7 @@ interface Component {
     nodeName: string,
     namespaceURI?: string,
     attrs: Attrs,
-    children: (Component | string)[],
+    children: Child[],
     render: (container?: HTMLNode) => HTMLNode,
     toString: () => string
 }
@@ -40,7 +40,8 @@ interface AbbrAttrChildrenAddable extends AttrChildrenAddable {
 }
 
 const normalizeToComponent = (child: Child) => {
-    if (typeof child === 'string') return rawComponent('#text')(child);
+    if (child == null || typeof child === 'boolean') return rawComponent('#text')('');
+    if (typeof child === 'string' || typeof child === 'number') return rawComponent('#text')(child + '');
     return child
 };
 
@@ -73,6 +74,7 @@ const compareNodeType = (node: Node, nodeName: string): nodeCompareResult => {
 };
 
 const applyComponent = (containerElement: Element, targetElement: HTMLNode, prevNode: HTMLNode, childComponent: Component) => {
+
     switch (compareNodeType(targetElement, childComponent.nodeName)) {
         case nodeCompareResult.SAME_TYPE:
             return childComponent.render(targetElement);
@@ -132,13 +134,13 @@ const updateChildren = (container: Element, newChildrenGroup: any[]) => {
                             return Object.assign(rendered, {
                                 [CHILD_INDEX]: groupIndex
                             })
-                        }catch(e){
+                        } catch (e) {
                             throw Object.assign(e, {childIndex: index});
                         }
                     }, null)
-            }catch(e){
+            } catch (e) {
                 throw Object.assign(new Error(`error at child#${groupIndex}${newChildrenGroup.length > 1 && e.childIndex != null ? `[${e.childIndex}]` : ''}: ${e.depth == null ? '\n' : ''}${e.message}`), {
-                    depth :e.depth
+                    depth: e.depth
                 });
             }
         });
@@ -154,11 +156,11 @@ const createComponent = (nodeName: string, namespaceURI?: string, attrs?: Attrs,
         attrs: attrs || {},
         children: children || [],
         toString() {
-            const idSelector = this.attrs.id ? '#'+this.attrs.id : '';
+            const idSelector = this.attrs.id ? '#' + this.attrs.id : '';
             var classSelector = (this.attrs.class || '')
                 .split(/ +/)
-                .filter((className:string) => className !== '')
-                .map((className:string) => '.' + className)
+                .filter((className: string) => className !== '')
+                .map((className: string) => '.' + className)
                 .join('');
             return this.nodeName + idSelector + classSelector
         },
@@ -199,7 +201,7 @@ const createComponent = (nodeName: string, namespaceURI?: string, attrs?: Attrs,
             } catch (e) {
                 var indentedMessage = e.message
                     .split('\n')
-                    .map((s:string) => '  ' + s)
+                    .map((s: string) => '  ' + s)
                     .join('\n')
                     .slice(2);
                 throw Object.assign(new Error(`\n${this} ${indentedMessage}`), {

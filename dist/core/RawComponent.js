@@ -17,8 +17,10 @@ var nodeCompareResult;
     nodeCompareResult[nodeCompareResult["DIFFERENT_TYPE"] = 2] = "DIFFERENT_TYPE";
 })(nodeCompareResult || (nodeCompareResult = {}));
 var normalizeToComponent = function (child) {
-    if (typeof child === 'string')
-        return rawComponent('#text')(child);
+    if (child == null || typeof child === 'boolean')
+        return rawComponent('#text')('');
+    if (typeof child === 'string' || typeof child === 'number')
+        return rawComponent('#text')(child + '');
     return child;
 };
 var updateAttrs = function (container, attrs) {
