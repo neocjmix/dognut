@@ -106,12 +106,14 @@ var updateChildren = function (container, newChildrenGroup) {
                         _a));
                 }
                 catch (e) {
-                    throw new Error("at index " + index + " :\n" + e.message);
+                    throw Object.assign(e, { childIndex: index });
                 }
             }, null);
         }
         catch (e) {
-            throw new Error("update error in group " + groupIndex + " :\n" + e.message);
+            throw Object.assign(new Error("error at child#" + groupIndex + (newChildrenGroup.length > 1 && e.childIndex != null ? "[" + e.childIndex + "]" : '') + ": " + (e.depth == null ? '\n' : '') + e.message), {
+                depth: e.depth
+            });
         }
     });
     var oldChildrenLeftUnmatched = oldChildrenGroupedByIndex.slice(newChildrenGroup.length);
@@ -125,7 +127,11 @@ var createComponent = function (nodeName, namespaceURI, attrs, children) {
         children: children || [],
         toString: function () {
             var idSelector = this.attrs.id ? '#' + this.attrs.id : '';
-            var classSelector = (this.attrs.class || '').trim().split(/ +/).map(function (className) { return '.' + className; }).join('');
+            var classSelector = (this.attrs.class || '')
+                .split(/ +/)
+                .filter(function (className) { return className !== ''; })
+                .map(function (className) { return '.' + className; })
+                .join('');
             return this.nodeName + idSelector + classSelector;
         },
         render: function (container) {
@@ -162,12 +168,13 @@ var createComponent = function (nodeName, namespaceURI, attrs, children) {
                 return container;
             }
             catch (e) {
-                var indentedMessage = (e.depth ? '' : ':\n') + e.message
+                var indentedMessage = e.message
                     .split('\n')
                     .map(function (s) { return '  ' + s; })
-                    .join('\n');
-                throw Object.assign(new Error("\n" + this + indentedMessage), {
-                    depth: (e.depth || 0) + 1
+                    .join('\n')
+                    .slice(2);
+                throw Object.assign(new Error("\n" + this + " " + indentedMessage), {
+                    depth: e.depth == null ? 0 : e.depth + 1
                 });
             }
         }

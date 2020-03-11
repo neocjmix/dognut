@@ -133,11 +133,13 @@ const updateChildren = (container: Element, newChildrenGroup: any[]) => {
                                 [CHILD_INDEX]: groupIndex
                             })
                         }catch(e){
-                            throw new Error(`at index ${index} :\n${e.message}`)
+                            throw Object.assign(e, {childIndex: index});
                         }
                     }, null)
             }catch(e){
-                throw new Error(`update error in group ${groupIndex} :\n${e.message}`)
+                throw Object.assign(new Error(`error at child#${groupIndex}${newChildrenGroup.length > 1 && e.childIndex != null ? `[${e.childIndex}]` : ''}: ${e.depth == null ? '\n' : ''}${e.message}`), {
+                    depth :e.depth
+                });
             }
         });
 
@@ -153,7 +155,11 @@ const createComponent = (nodeName: string, namespaceURI?: string, attrs?: Attrs,
         children: children || [],
         toString() {
             const idSelector = this.attrs.id ? '#'+this.attrs.id : '';
-            const classSelector = (this.attrs.class || '').trim().split(/ +/).map((className:string) => '.'+className).join('');
+            var classSelector = (this.attrs.class || '')
+                .split(/ +/)
+                .filter((className:string) => className !== '')
+                .map((className:string) => '.' + className)
+                .join('');
             return this.nodeName + idSelector + classSelector
         },
         render(container) {
@@ -191,13 +197,14 @@ const createComponent = (nodeName: string, namespaceURI?: string, attrs?: Attrs,
 
                 return container
             } catch (e) {
-                const indentedMessage = (e.depth ? '' : ':\n') + e.message
+                var indentedMessage = e.message
                     .split('\n')
-                    .map((s: string) => '  ' + s)
-                    .join('\n');
-                throw Object.assign(new Error(`\n${this}${indentedMessage}`), {
-                    depth: (e.depth || 0) + 1
-                })
+                    .map((s:string) => '  ' + s)
+                    .join('\n')
+                    .slice(2);
+                throw Object.assign(new Error(`\n${this} ${indentedMessage}`), {
+                    depth: e.depth == null ? 0 : e.depth + 1
+                });
             }
         }
     }
