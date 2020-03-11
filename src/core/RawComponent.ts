@@ -144,10 +144,9 @@ const createComponent = (nodeName: string, namespaceURI?: string, attrs?: Attrs,
         attrs: attrs || {},
         children: children || [],
         toString() {
-            return [
-                [this.nodeName, this.attrs.id].filter(a => a).join('#'),
-                this.attrs.class
-            ].filter(a => a).join('.');
+            const idSelector = this.attrs.id ? '#'+this.attrs.id : '';
+            const classSelector = (this.attrs.class || '').split(' ').map((className:string) => '.'+className).join('');
+            return this.nodeName + idSelector + classSelector
         },
         render(container) {
             try {
