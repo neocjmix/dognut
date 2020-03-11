@@ -145,7 +145,7 @@ const createComponent = (nodeName: string, namespaceURI?: string, attrs?: Attrs,
         children: children || [],
         toString() {
             const idSelector = this.attrs.id ? '#'+this.attrs.id : '';
-            const classSelector = (this.attrs.class || '').split(' ').map((className:string) => '.'+className).join('');
+            const classSelector = (this.attrs.class || '').trim().split(/ +/).map((className:string) => '.'+className).join('');
             return this.nodeName + idSelector + classSelector
         },
         render(container) {
@@ -183,7 +183,7 @@ const createComponent = (nodeName: string, namespaceURI?: string, attrs?: Attrs,
 
                 return container
             } catch (e) {
-                const indentedMessage = (e.depth || ':\n') + e.message
+                const indentedMessage = (e.depth ? '' : ':\n') + e.message
                     .split('\n')
                     .map((s: string) => '  ' + s)
                     .join('\n');

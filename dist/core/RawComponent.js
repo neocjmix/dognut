@@ -115,7 +115,7 @@ var createComponent = function (nodeName, namespaceURI, attrs, children) {
         children: children || [],
         toString: function () {
             var idSelector = this.attrs.id ? '#' + this.attrs.id : '';
-            var classSelector = (this.attrs.class || '').split(' ').map(function (className) { return '.' + className; }).join('');
+            var classSelector = (this.attrs.class || '').trim().split(/ +/).map(function (className) { return '.' + className; }).join('');
             return this.nodeName + idSelector + classSelector;
         },
         render: function (container) {
@@ -152,7 +152,7 @@ var createComponent = function (nodeName, namespaceURI, attrs, children) {
                 return container;
             }
             catch (e) {
-                var indentedMessage = (e.depth || ':\n') + e.message
+                var indentedMessage = (e.depth ? '' : ':\n') + e.message
                     .split('\n')
                     .map(function (s) { return '  ' + s; })
                     .join('\n');
