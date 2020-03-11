@@ -91,18 +91,28 @@ var updateChildren = function (container, newChildrenGroup) {
     var oldChildrenGroupedByIndex = groupByIndexAttr(oldChildren);
     newChildrenGroup
         .forEach(function (newChildren, groupIndex) {
-        var flattenedNewChildren = common_1.flatten(newChildren);
-        var assignedOldChildGroup = oldChildrenGroupedByIndex[groupIndex];
-        flattenedNewChildren
-            .reduce(function (prevElement, newChild, index) {
-            var _a;
-            var childComponent = normalizeToComponent(newChild);
-            var assignedOldChild = assignedOldChildGroup && assignedOldChildGroup[index];
-            var rendered = applyComponent(container, assignedOldChild, prevElement, childComponent);
-            return Object.assign(rendered, (_a = {},
-                _a[CHILD_INDEX] = groupIndex,
-                _a));
-        }, null);
+        try {
+            var flattenedNewChildren = common_1.flatten(newChildren);
+            var assignedOldChildGroup_1 = oldChildrenGroupedByIndex[groupIndex];
+            flattenedNewChildren
+                .reduce(function (prevElement, newChild, index) {
+                var _a;
+                try {
+                    var childComponent = normalizeToComponent(newChild);
+                    var assignedOldChild = assignedOldChildGroup_1 && assignedOldChildGroup_1[index];
+                    var rendered = applyComponent(container, assignedOldChild, prevElement, childComponent);
+                    return Object.assign(rendered, (_a = {},
+                        _a[CHILD_INDEX] = groupIndex,
+                        _a));
+                }
+                catch (e) {
+                    throw new Error("at index " + index + " :\n" + e.message);
+                }
+            }, null);
+        }
+        catch (e) {
+            throw new Error("update error in group " + groupIndex + " :\n" + e.message);
+        }
     });
     var oldChildrenLeftUnmatched = oldChildrenGroupedByIndex.slice(newChildrenGroup.length);
     common_1.flatten(oldChildrenLeftUnmatched).forEach(function (childNode) { return childNode.remove(); });

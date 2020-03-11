@@ -119,18 +119,26 @@ const updateChildren = (container: Element, newChildrenGroup: any[]) => {
 
     newChildrenGroup
         .forEach((newChildren, groupIndex) => {
-            const flattenedNewChildren = flatten(newChildren);
-            const assignedOldChildGroup = oldChildrenGroupedByIndex[groupIndex];
+            try {
+                const flattenedNewChildren = flatten(newChildren);
+                const assignedOldChildGroup = oldChildrenGroupedByIndex[groupIndex];
 
-            flattenedNewChildren
-                .reduce((prevElement, newChild, index): DognutNode => {
-                    const childComponent = normalizeToComponent(newChild);
-                    const assignedOldChild = assignedOldChildGroup && assignedOldChildGroup[index];
-                    const rendered = applyComponent(container, assignedOldChild, prevElement, childComponent);
-                    return Object.assign(rendered, {
-                        [CHILD_INDEX]: groupIndex
-                    })
-                }, null)
+                flattenedNewChildren
+                    .reduce((prevElement, newChild, index): DognutNode => {
+                        try {
+                            const childComponent = normalizeToComponent(newChild);
+                            const assignedOldChild = assignedOldChildGroup && assignedOldChildGroup[index];
+                            const rendered = applyComponent(container, assignedOldChild, prevElement, childComponent);
+                            return Object.assign(rendered, {
+                                [CHILD_INDEX]: groupIndex
+                            })
+                        }catch(e){
+                            throw new Error(`at index ${index} :\n${e.message}`)
+                        }
+                    }, null)
+            }catch(e){
+                throw new Error(`update error in group ${groupIndex} :\n${e.message}`)
+            }
         });
 
     const oldChildrenLeftUnmatched: HTMLNode[][] = oldChildrenGroupedByIndex.slice(newChildrenGroup.length);
