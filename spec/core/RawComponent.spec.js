@@ -157,6 +157,20 @@ describe('RawComponent', () => {
             })
           })
 
+          describe('and : Component\'s child is falsy', () => {
+            beforeEach('render falsy child', () => {
+              Div()(false).render(appContainer)
+            })
+
+            it('then: container\'s childnode should be textNode', () => {
+              expect(appContainer.childNodes[0].nodeName).to.equal('#text')
+            })
+
+            it('then: container\'s childnode should be empty', () => {
+              expect(appContainer.childNodes[0].textContent).to.equal('')
+            })
+          })
+
           it('then: removes old attrs and contents not existing in new content', () => {
             Div()().render(appContainer)
             expect(appContainer.getAttributeNames()).to.have.lengthOf(0)
