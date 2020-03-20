@@ -4,7 +4,7 @@ import Combinatorics from 'js-combinatorics'
 
 const expect = chai.expect;
 
-const createCombinationsOfTestSet = (testSets: { exp: string, data: { [key: string]: string } }[]) =>
+const createCombinationsOfTestSet = testSets =>
     Combinatorics.permutationCombination(testSets).toArray()
         .map(set => ({
             exp: set.map(item => item.exp).join(''),
@@ -30,7 +30,7 @@ describe('common functions', () => {
             beforeEach(() => exp = '.test-class1')
 
             describe('when: parse the expession ', () => {
-                let attr: any;
+                let attr;
                 beforeEach(() => attr = parseAbbr('.test-class1'))
 
                 it('then: result has a class attr', () => expect(attr.class).to.equal('test-class1'))
@@ -43,7 +43,7 @@ describe('common functions', () => {
             beforeEach(() => exp = '#test-id')
 
             describe('when: parse the expession ', () => {
-                let attr: any;
+                let attr;
                 beforeEach(() => attr = parseAbbr('#test-id'))
 
                 it('then: result has an id attr', () => expect(attr.id).to.equal('test-id'))
@@ -56,7 +56,7 @@ describe('common functions', () => {
             beforeEach(() => exp = ':test-type')
 
             describe('when: parse the expession ', () => {
-                let attr: any;
+                let attr;
                 beforeEach(() => attr = parseAbbr(':test-type'))
 
                 it('then: result has a type attr', () => expect(attr.type).to.equal('test-type'))
@@ -69,7 +69,7 @@ describe('common functions', () => {
             beforeEach(() => exp = '[my-key=my-value]')
 
             describe('when: parse the expession ', () => {
-                let attr: any;
+                let attr;
                 beforeEach(() => attr = parseAbbr('[my-key=my-value]'))
 
                 it('then: result has an attr', () => expect(attr['my-key']).to.equal('my-value'))
@@ -78,7 +78,7 @@ describe('common functions', () => {
         })
 
         describe('given: there are combinated expessions', () => {
-            let testSet: any;
+            let testSet;
             beforeEach(() => {
                 testSet = createCombinationsOfTestSet([
                     {exp: '.test-class1', data: {class: 'test-class1'}},
@@ -93,7 +93,7 @@ describe('common functions', () => {
 
             describe('when: parse each expession ', () => {
                 it('then: result has right attr', () => {
-                    testSet.forEach((item: any) => expect(parseAbbr(item.exp)).to.deep.equal(item.data))
+                    testSet.forEach((item) => expect(parseAbbr(item.exp)).to.deep.equal(item.data))
                 })
             })
         })

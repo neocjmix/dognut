@@ -1,11 +1,11 @@
 import jsdom from 'jsdom-global'
-import sampleComponent from './htmlComponent.spec.sample'
+// import sampleComponent from './htmlComponent.spec.sample'
 import * as fs from "fs";
 
 const sampleResult = fs.readFileSync(__dirname + '/htmlElements.test.sample.html', 'utf8');
 describe('RawComponents for html5 tags', () => {
   describe('render', () => {
-    let cleanup: any, expected, actual;
+    let cleanup, expected, actual;
     beforeEach('setup app container', () => {
       cleanup = jsdom();
       document.body.innerHTML = `<div id="expected">${sampleResult}</div><div id="actual"></div>`;
