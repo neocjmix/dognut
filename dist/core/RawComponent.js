@@ -8,6 +8,7 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var common_1 = require("./common");
+var to_style_1 = require("to-style");
 var CHILD_INDEX = Symbol('childIndex');
 exports.CHILD_INDEX = CHILD_INDEX;
 var nodeCompareResult;
@@ -35,6 +36,22 @@ var updateAttrs = function (container, attrs) {
         .concat([["", null]]) // add sentinel for one iteration at least
         .forEach(function (_a) {
         var key = _a[0], value = _a[1];
+        var onSomethingKeyExists = key.match(/(?<=^on)[A-Z].*$/);
+        if (onSomethingKeyExists) {
+            if (typeof value === 'function') {
+                container.addEventListener(onSomethingKeyExists[0].toLowerCase(), value);
+            }
+            else if (value.listener) {
+                container.addEventListener(onSomethingKeyExists[0].toLowerCase(), value.listener, value.options);
+            }
+            return;
+        }
+        if (key === 'style' && typeof value !== 'string') {
+            value = to_style_1.string(value);
+        }
+        if (key === 'class' && Array.isArray(value)) {
+            value = value.join(' ');
+        }
         //remove existing Attribute that is not in new Attrs
         while (existingAttrNames[0] && existingAttrNames[0] !== key) {
             container.removeAttribute(existingAttrNames[0]);

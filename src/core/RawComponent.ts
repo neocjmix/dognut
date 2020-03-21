@@ -1,4 +1,5 @@
 import {flatten, parseAbbr, parseTemplate} from './common'
+import {string as toStyleString} from 'to-style';
 
 const CHILD_INDEX = Symbol('childIndex');
 
@@ -53,6 +54,24 @@ const updateAttrs = (container: Element, attrs: Attrs) => {
         .sort(([key1], [key2]) => key1.localeCompare(key2))
         .concat([["", null]]) // add sentinel for one iteration at least
         .forEach(([key, value]) => {
+            const onSomethingKeyExists = key.match(/(?<=^on)[A-Z].*$/);
+
+            if (onSomethingKeyExists) {
+                if (typeof value === 'function') {
+                    container.addEventListener(onSomethingKeyExists[0].toLowerCase(), value)
+                } else if (value.listener) {
+                    container.addEventListener(onSomethingKeyExists[0].toLowerCase(), value.listener, value.options)
+                }
+                return
+            }
+
+            if (key === 'style' && typeof value !== 'string') {
+                value = toStyleString(value)
+            }
+
+            if (key === 'class' && Array.isArray(value)) {
+                value = value.join(' ')
+            }
 
             //remove existing Attribute that is not in new Attrs
             while (existingAttrNames[0] && existingAttrNames[0] !== key) {
