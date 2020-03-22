@@ -23,7 +23,10 @@ describe('RawComponent', () => {
           })
 
           describe('and: Component\'s onClick attr is a function', (DivWithOnClickHandler, onClickHandler) => {
-            beforeEach(() => DivWithOnClickHandler = Div({ onClick: onClickHandler = sinon.fake() }))
+            beforeEach(() => DivWithOnClickHandler = Div({
+              class: 'click',
+              onClick: onClickHandler = sinon.fake()
+            }))
 
             describe('when: renders on container', () => {
               beforeEach(() => DivWithOnClickHandler.render(appContainer))
@@ -35,19 +38,39 @@ describe('RawComponent', () => {
                   expect(onClickHandler.called).to.be.true
                 })
               })
+
+            })
+
+            describe('when: renders on container repeatedly', () => {
+              beforeEach(() => {
+                DivWithOnClickHandler.render(appContainer)
+                DivWithOnClickHandler.render(appContainer)
+                DivWithOnClickHandler.render(appContainer)
+                DivWithOnClickHandler.render(appContainer)
+                DivWithOnClickHandler.render(appContainer)
+              })
+
+              describe('and: container is clicked', () => {
+                beforeEach(() => appContainer.click())
+
+                it('then: onClick function is called only once', () => {
+                  expect(onClickHandler.callCount).to.equal(1)
+                })
+              })
             })
           })
 
           describe('and: onClick attr is an object containing listener', () => {
             describe('and: the object has an option \'once\'', (DivWithOnClickHandler, onClickHandler) => {
-              beforeEach(() => DivWithOnClickHandler = Div({
-                onClick: {
-                  listener: onClickHandler = sinon.fake(),
-                  options: {
-                    once: true
+              beforeEach(() => DivWithOnClickHandler =
+                Div({
+                  onClick: {
+                    listener: onClickHandler = sinon.fake(),
+                    options: {
+                      once: true
+                    }
                   }
-                }
-              }))
+                }))
               describe('when: renders on container', () => {
                 beforeEach(() => DivWithOnClickHandler.render(appContainer))
                 describe('and: container is clicked twice', () => {
