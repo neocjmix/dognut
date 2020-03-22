@@ -130,8 +130,10 @@ var updateChildren = function (container, newChildrenGroup) {
             }, null);
         }
         catch (e) {
-            throw Object.assign(new Error("error at child#" + groupIndex + (newChildrenGroup.length > 1 && e.childIndex != null ? "[" + e.childIndex + "]" : '') + ": " + (e.depth == null ? '\n' : '') + e.message), {
-                depth: e.depth
+            var message = "error at child#" + groupIndex + (newChildrenGroup.length > 1 && e.childIndex != null ? "[" + e.childIndex + "]" : '') + ": " + (e.depth == null ? '\n' : '') + e.message;
+            throw Object.assign(new Error(message), {
+                depth: e.depth,
+                stack: e.stack,
             });
         }
     });
@@ -193,7 +195,8 @@ var createComponent = function (nodeName, namespaceURI, attrs, children) {
                     .join('\n')
                     .slice(2);
                 throw Object.assign(new Error("\n" + this + " " + indentedMessage), {
-                    depth: e.depth == null ? 0 : e.depth + 1
+                    depth: e.depth == null ? 0 : e.depth + 1,
+                    stack: e.stack
                 });
             }
         }

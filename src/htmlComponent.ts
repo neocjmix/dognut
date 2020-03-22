@@ -1,4 +1,4 @@
-import {rawComponent} from './core/RawComponent.js'
+import {rawComponent} from './core/RawComponent'
 
 // Document metadata
 export const $link = rawComponent('link');

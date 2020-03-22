@@ -56,7 +56,7 @@ var parseAbbr = function (expression) {
         },
     };
     return (expression.match(EVERY_PARTS_STARTS_WITH_DOT_HASH_COLON_OR_BETWEEN_BRACKET) || [])
-        .map(function (part) { return (AttrExpMap[((part === null || part === void 0 ? void 0 : part[0]) || '')] || (function () { return ({}); }))(part); })
+        .map(function (part) { var _a; return (AttrExpMap[(((_a = part) === null || _a === void 0 ? void 0 : _a[0]) || '')] || (function () { return ({}); }))(part); })
         .reduce(function (_a, _b) {
         var classValue1 = _a.class, attrs1 = __rest(_a, ["class"]);
         var classValue2 = _b.class, attrs2 = __rest(_b, ["class"]);

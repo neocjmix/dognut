@@ -1,4 +1,4 @@
-import {rawComponent} from './core/RawComponent.js'
+import {rawComponent} from './core/RawComponent'
 
 export const $a = rawComponent('a', 'http://www.w3.org/2000/svg');
 export const $animate = rawComponent('animate', 'http://www.w3.org/2000/svg');
