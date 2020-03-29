@@ -32,12 +32,27 @@ interface ChildrenAddable {
     (...children: Child[]): Component
 }
 
-interface AttrChildrenAddable extends ChildrenAddable {
-    (attrs: Attrs): ChildrenAddable & Component;
-}
+/**
+ * seems better to overload interface like below, but in that case,
+ * the module doesn't recognize AbbrAttrChildrenAddable as a function but as an exported variable,
+ * so better in auto-completion but worse in IDE readability
+ * (usually displayed in the most IDE in different color from HTML tags).
+ * I choose readability for now, but it can be changed in the future.
+ *
+<code>
+    interface AttrChildrenAddable extends ChildrenAddable {
+        (attrs: Attrs): ChildrenAddable & Component;
+    }
 
-interface AbbrAttrChildrenAddable extends AttrChildrenAddable {
-    (abbrebiation: TemplateStringsArray, ...variables: any[]): ChildrenAddable & Component;
+    interface AbbrAttrChildrenAddable {
+        (abbrebiation: any, ...variables: any[]): ChildrenAddable & Component;
+        (abbrebiation: TemplateStringsArray, ...variables: any[]): ChildrenAddable & Component;
+        (...children: Child[]): Component
+    }
+</code>
+*/
+interface AbbrAttrChildrenAddable {
+    (attrs: Attrs | TemplateStringsArray | Child, ...children:Child[]): ChildrenAddable & Component;
 }
 
 const normalizeToComponent = (child: Child) => {
@@ -121,6 +136,8 @@ const applyComponent = (containerElement: Element, targetElement: HTMLNode, prev
 
 const isDognutNode = (node: Node): node is DognutNode => CHILD_INDEX in node;
 
+const isHTMLNode = (node: ChildNode): node is HTMLNode => node instanceof Element || node instanceof Text;
+
 const groupByIndexAttr = (oldChildren: HTMLNode[]) => oldChildren
     .reduce((arr: HTMLNode[][], oldChild) => {
         const currentIndex = isDognutNode(oldChild) ? oldChild[CHILD_INDEX] : arr.length;
@@ -128,8 +145,6 @@ const groupByIndexAttr = (oldChildren: HTMLNode[]) => oldChildren
         arr[currentIndex].push(oldChild);
         return arr
     }, []);
-
-const isHTMLNode = (node: ChildNode): node is HTMLNode => node instanceof Element || node instanceof Text;
 
 const updateChildren = (container: Element, newChildrenGroup: any[]) => {
     const oldChildren = Array.from(container.childNodes)
