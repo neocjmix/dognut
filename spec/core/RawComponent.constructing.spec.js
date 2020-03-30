@@ -1,5 +1,5 @@
-import { rawComponent } from '../../src/core/RawComponent'
 import chai from 'chai'
+import { rawComponent } from 'src'
 
 const expect = chai.expect
 

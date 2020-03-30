@@ -1,7 +1,7 @@
 import jsdom from 'jsdom-global'
 import chai from 'chai'
 import sinon from 'sinon'
-import { rawComponent } from '../../src/core/RawComponent'
+import { rawComponent } from 'src'
 
 const expect = chai.expect
 

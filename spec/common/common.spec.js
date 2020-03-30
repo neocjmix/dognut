@@ -1,6 +1,6 @@
-import {parseAbbr} from '../../src/core/common'
 import chai from 'chai'
 import Combinatorics from 'js-combinatorics'
+import { parseAbbr } from 'src/core/common'
 
 const expect = chai.expect;
 
