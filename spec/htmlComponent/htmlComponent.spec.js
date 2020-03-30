@@ -1,8 +1,8 @@
 import jsdom from 'jsdom-global'
-// import sampleComponent from './htmlComponent.spec.sample'
-import * as fs from "fs";
+import sampleComponent from './htmlComponent.spec.sample'
+import * as fs from 'fs';
 
-const sampleResult = fs.readFileSync(__dirname + '/htmlElements.test.sample.html', 'utf8');
+const sampleResult = fs.readFileSync(__dirname + '/htmlComponent.spec.sample.html', 'utf8');
 describe('RawComponents for html5 tags', () => {
   describe('render', () => {
     let cleanup, expected, actual;
