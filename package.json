@@ -20,7 +20,7 @@
     "babel-plugin-module-resolver": "^4.0.0",
     "chai": "^4.2.0",
     "js-combinatorics": "^0.5.5",
-    "jsdom": "15.2.1",
+    "jsdom": "16.5.0",
     "jsdom-global": "3.0.2",
     "mocha": "^7.1.1",
     "sinon": "^9.0.1",
